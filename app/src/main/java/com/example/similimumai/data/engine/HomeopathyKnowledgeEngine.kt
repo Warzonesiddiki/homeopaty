@@ -126,7 +126,8 @@ object HomeopathyKnowledgeEngine {
                 matchedRubricId = "r_head_sun_agg"
                 isPqrs = true
             }
-            lower.contains("4 to 8") || lower.contains("4-8") || lower.contains("evening") || lower.contains("shaam") -> {
+            lower.contains("4 to 8") || lower.contains("4-8") || lower.contains("shaam") ||
+                (lower.contains("pm") && lower.contains("4") && lower.contains("8")) -> {
                 mod = "Aggravated strictly between 4:00 PM and 8:00 PM (< 4-8 PM)"
                 matchedRubricId = "r_stomach_bloating_4_8pm"
                 isPqrs = true
@@ -135,7 +136,8 @@ object HomeopathyKnowledgeEngine {
                 mod = "Ameliorated by warm drinks and hot applications (> warm drinks)"
                 matchedRubricId = "r_stomach_warm_drinks_amel"
             }
-            lower.contains("open air") || lower.contains("thandi hawa") || lower.contains("fresh air") -> {
+            lower.contains("open air") || lower.contains("thandi hawa") || lower.contains("fresh air") ||
+                lower.contains("breeze") -> {
                 mod = "Ameliorated in cool open air, worse in warm room (> open air)"
                 matchedRubricId = "r_gen_open_air_amel"
             }
@@ -156,6 +158,12 @@ object HomeopathyKnowledgeEngine {
             lower.contains("grief") || lower.contains("anger") || lower.contains("gusse") -> {
                 mod = "Causation: Ailments from emotional trauma / suppressed anger"
                 matchedRubricId = if (lower.contains("anger") || lower.contains("gusse")) "r_mind_anger_suppressed" else "r_mind_grief"
+                isPqrs = true
+            }
+            lower.contains("left alone") || lower.contains("alone in the dark") ||
+                lower.contains("fear of being alone") || lower.contains("afraid of the dark") -> {
+                mod = "Fear of being alone / of the dark"
+                matchedRubricId = "r_mind_fear_alone"
                 isPqrs = true
             }
         }
@@ -179,6 +187,12 @@ object HomeopathyKnowledgeEngine {
             lower.contains("cold water") && lower.contains("vomit") -> {
                 conc = "Craves ice water, vomited as soon as warm in stomach"
                 matchedRubricId = "r_stomach_cold_drinks_vomit_warm"
+                isPqrs = true
+            }
+            lower.contains("ice cold") || lower.contains("ice-cold") ||
+                (lower.contains("cold water") && (lower.contains("crave") || lower.contains("ice"))) -> {
+                conc = "Craving for ice-cold water / ice cream"
+                if (matchedRubricId.isEmpty()) matchedRubricId = "r_stomach_ice_cold"
                 isPqrs = true
             }
             lower.contains("restless") || lower.contains("bechaini") -> {

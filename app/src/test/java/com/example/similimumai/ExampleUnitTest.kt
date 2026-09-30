@@ -233,6 +233,41 @@ class ExampleUnitTest {
         assertEquals("Head (Cephalic)", symptom.location)
     }
 
+    @Test
+    fun `parser - 4 to 8 pm time window maps to the Lyc bloating rubric`() {
+        val symptom = HomeopathyKnowledgeEngine.parseUtteranceToSymptom(
+            "My gas pain is strictly between 4:00 PM and 8:00 PM every day."
+        )
+        assertEquals("Abdomen distension, flatulence 4:00 PM to 8:00 PM", symptom.canonicalRubric)
+        assertTrue(symptom.isPqrs)
+    }
+
+    @Test
+    fun `parser - cool evening breeze maps to the open-air amel rubric`() {
+        val symptom = HomeopathyKnowledgeEngine.parseUtteranceToSymptom(
+            "In the open cool evening breeze he immediately calms down."
+        )
+        assertEquals("Generalities, open cool air ameliorates", symptom.canonicalRubric)
+    }
+
+    @Test
+    fun `parser - fear of being alone maps to the fear rubric without touching grief`() {
+        val fear = HomeopathyKnowledgeEngine.parseUtteranceToSymptom(
+            "I get terrified when left alone in the dark."
+        )
+        assertEquals("Fear of being alone", fear.canonicalRubric)
+        assertTrue(fear.isPqrs)
+    }
+
+    @Test
+    fun `parser - ice-cold water craving maps to the ice-cold desire rubric`() {
+        val symptom = HomeopathyKnowledgeEngine.parseUtteranceToSymptom(
+            "I crave ice-cold water and ice cream like crazy."
+        )
+        assertEquals("Desire for ice-cold water, ice cream, cold drinks", symptom.canonicalRubric)
+        assertTrue(symptom.isPqrs)
+    }
+
     // ────────────────────────────────────────────────────────────────────────
     // Test 8: Case Sheet generation
     // ────────────────────────────────────────────────────────────────────────
