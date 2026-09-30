@@ -1,0 +1,6 @@
+{
+  "name": "Similimum AI",
+  "description": "Ambient AI clinical companion for Homeopathic Doctors during live patient consultations with live repertorization and symptom completion.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
