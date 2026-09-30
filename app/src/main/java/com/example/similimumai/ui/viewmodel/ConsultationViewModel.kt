@@ -1,6 +1,9 @@
 package com.example.similimumai.ui.viewmodel
 
 import android.app.Application
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.similimumai.data.engine.GeminiClinicalService
@@ -68,6 +71,14 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
 
         // Load default initial case (Nat-m Case)
         loadInitialDefaultCase()
+
+        // Pre-populate the LM calculator (LM1 standard) and Kent evaluator defaults
+        _uiState.update {
+            it.copy(
+                lmProtocol = HomeopathyKnowledgeEngine.calculateLmProtocol(it.lmPotencyName),
+                kentObservationResult = HomeopathyKnowledgeEngine.evaluateKentObservation(it.kentInput)
+            )
+        }
     }
 
     private fun loadInitialDefaultCase() {
@@ -313,6 +324,56 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
+    fun setCaseMode(mode: CaseMode) {
+        _uiState.update { it.copy(caseMode = mode) }
+    }
+
+    // LM 50-Millesimal dilution protocol (Organon §270-§272)
+    fun updateLmParameters(potency: String, isHypersensitive: Boolean) {
+        val protocol = HomeopathyKnowledgeEngine.calculateLmProtocol(potency, isHypersensitive)
+        _uiState.update {
+            it.copy(
+                lmPotencyName = potency,
+                lmHypersensitive = isHypersensitive,
+                lmProtocol = protocol
+            )
+        }
+    }
+
+    // Kent's 12 Prognostic Observations evaluator
+    fun evaluateKentObservation(input: KentReactionInput) {
+        val result = HomeopathyKnowledgeEngine.evaluateKentObservation(input)
+        _uiState.update { it.copy(kentInput = input, kentObservationResult = result) }
+    }
+
+    // Plain-text case sheet + prescription clipboard generator (MVP MVE criterion 4)
+    fun copyCaseSheetToClipboard(): String {
+        val state = _uiState.value
+        val sheet = HomeopathyKnowledgeEngine.generateCaseSheet(
+            patientName = state.patientName,
+            patientAge = state.patientAge,
+            patientSex = state.patientSex,
+            thermal = state.patientThermal,
+            miasm = state.patientMiasm,
+            chiefComplaint = state.chiefComplaint,
+            caseMode = state.caseMode.label,
+            symptoms = state.symptoms,
+            activeRubrics = state.activeRubrics,
+            remedyScores = state.remedyScores,
+            rxRemedy = state.rxRemedyName,
+            rxPotency = state.rxPotency,
+            rxScale = state.rxScale,
+            rxPosology = state.rxPosology,
+            dietaryRestrictions = state.rxDietaryRestrictions,
+            hering = state.heringEvaluation,
+            lmProtocol = state.lmProtocol
+        )
+        val app: Application = getApplication()
+        val clipboard = app.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("Similimum AI Case Sheet", sheet))
+        return sheet
+    }
+
     fun evaluateHering(insideToOut: Boolean, aboveDown: Boolean, vitalToLess: Boolean, reverseTime: Boolean) {
         val evaluation = HomeopathyKnowledgeEngine.evaluateHeringProgression(
             insideToOutside = insideToOut,
@@ -358,7 +419,7 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
             val session = SessionEntity(
                 patientId = patientId,
                 sessionDate = System.currentTimeMillis(),
-                consultationType = "CHRONIC",
+                consultationType = _uiState.value.caseMode.name,
                 summaryNotes = _uiState.value.symptoms.joinToString("; ") { "${it.location} - ${it.sensation} (${it.modalities})" },
                 totalityScore = (_uiState.value.symptoms.map { it.completenessScore }.average().takeIf { !it.isNaN() } ?: 60.0).toInt(),
                 prescribedRemedy = _uiState.value.rxRemedyName,

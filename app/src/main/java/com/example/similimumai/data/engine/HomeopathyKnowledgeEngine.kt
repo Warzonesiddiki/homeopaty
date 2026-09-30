@@ -3,524 +3,29 @@ package com.example.similimumai.data.engine
 import com.example.similimumai.data.model.*
 import java.util.UUID
 
+/**
+ * The deterministic clinical heart of Similimum AI (docs/02, docs/engineering/project-structure.md).
+ *
+ * Reference data (30 polychrests, 160+ rubrics) is delegated to the pure-data objects
+ * [PolychrestDatabase] and [RubricDatabase] to keep this file within the project's
+ * 500-line source guideline. All algorithms remain pure functions for thread safety
+ * and deterministic JVM testing.
+ */
 object HomeopathyKnowledgeEngine {
 
-    val polychrests: List<Remedy> = listOf(
-        Remedy(
-            id = "nat_m",
-            abbreviation = "Nat-m",
-            fullName = "Natrum Muriaticum",
-            commonName = "Chloride of Sodium / Sea Salt",
-            thermalState = ThermalState.HOT,
-            dominantMiasm = Miasm.PSORA,
-            keynotes = listOf(
-                "Ailments from silent grief, betrayed trust, emotional disappointment",
-                "Consolation aggravates weeping; introverted, dwells on past disagreeable events",
-                "Headache from sunrise to sunset; hammering throbbing like little hammers",
-                "Craving for salt and salty food; deep fissure in the middle of lower lip",
-                "Mapped tongue; geographic patches; weakness of limbs on waking in morning"
-            ),
-            inimicalRemedies = listOf(),
-            complementaryRemedies = listOf("Apis", "Sep", "Ign"),
-            antidoteRemedies = listOf("Camph", "Phos", "Spir-nit-d")
-        ),
-        Remedy(
-            id = "lyc",
-            abbreviation = "Lyc",
-            fullName = "Lycopodium Clavatum",
-            commonName = "Club Moss",
-            thermalState = ThermalState.CHILLY,
-            dominantMiasm = Miasm.PSORA,
-            keynotes = listOf(
-                "Aggravation specifically between 4:00 PM and 8:00 PM",
-                "Right-sided symptoms or symptoms migrating from right to left",
-                "Severe abdominal bloating; full after eating just a few mouthfuls",
-                "Desire for warm food, hot drinks; aversion to cold drinks",
-                "Intellectually keen but physically weak; anticipatory anxiety before public events"
-            ),
-            inimicalRemedies = listOf(),
-            complementaryRemedies = listOf("Iod", "Chel", "Puls", "Lach"),
-            antidoteRemedies = listOf("Camph", "Puls", "Caust")
-        ),
-        Remedy(
-            id = "ars_alb",
-            abbreviation = "Ars",
-            fullName = "Arsenicum Album",
-            commonName = "White Arsenic",
-            thermalState = ThermalState.CHILLY,
-            dominantMiasm = Miasm.SYPHILIS,
-            keynotes = listOf(
-                "Great mental and physical restlessness with rapid prostration and exhaustion",
-                "Intense anxiety and fear of death; believes medicine is useless",
-                "Burning pains ameliorated by hot applications and warm drinks",
-                "Thirst for small sips of water at very frequent intervals",
-                "Midnight aggravation: attacks peak between 1:00 AM and 2:00 AM"
-            ),
-            inimicalRemedies = listOf(),
-            complementaryRemedies = listOf("All-s", "Carb-v", "Phos", "Thuj"),
-            antidoteRemedies = listOf("Camph", "Chin", "Ferr", "Hep", "Ipec")
-        ),
-        Remedy(
-            id = "phos",
-            abbreviation = "Phos",
-            fullName = "Phosphorus",
-            commonName = "Phosphorus",
-            thermalState = ThermalState.CHILLY,
-            dominantMiasm = Miasm.TUBERCULAR,
-            keynotes = listOf(
-                "Tall, slender, narrow-chested, sensitive, highly impressionable, clairvoyant",
-                "Craves ice-cold drinks, ice cream, spicy and refreshing food",
-                "Cold drinks relieve stomach immediately, but vomited as soon as water warms in stomach",
-                "Severe fear of thunderstorms, twilight, being alone, and the dark",
-                "Burning sensations in spots, along spine, between scapulae; hemorrhagic tendency"
-            ),
-            inimicalRemedies = listOf("Caust"), // Inimical to Causticum!
-            complementaryRemedies = listOf("Ars", "All-c", "Carb-v", "Lyc"),
-            antidoteRemedies = listOf("Camph", "Coff", "Nux-v")
-        ),
-        Remedy(
-            id = "puls",
-            abbreviation = "Puls",
-            fullName = "Pulsatilla Pratensis",
-            commonName = "Wind Flower",
-            thermalState = ThermalState.HOT,
-            dominantMiasm = Miasm.PSORA,
-            keynotes = listOf(
-                "Mild, gentle, yielding, tearful disposition; weeps easily while narrating complaints",
-                "Thirstlessness in almost all complaints, even with dry mouth",
-                "All symptoms ameliorated in open fresh cool air; worse in warm stuffy rooms",
-                "Symptoms ever changing and wandering (pains shift rapidly from one joint to another)",
-                "Craves consolation and sympathy; rich fatty foods, pastries, and pork aggravate"
-            ),
-            inimicalRemedies = listOf(),
-            complementaryRemedies = listOf("Lyc", "Sil", "Kali-bi", "Kali-s"),
-            antidoteRemedies = listOf("Cham", "Coff", "Ign", "Nux-v")
-        ),
-        Remedy(
-            id = "nux_v",
-            abbreviation = "Nux-v",
-            fullName = "Nux Vomica",
-            commonName = "Poison Nut",
-            thermalState = ThermalState.CHILLY,
-            dominantMiasm = Miasm.PSORA,
-            keynotes = listOf(
-                "Sedentary lifestyle, high-stress executive, impatient, irritable, quarrelsome",
-                "Ailments from over-study, business worry, stimulants, alcohol, coffee, spices",
-                "Frequent ineffectual urging for stool and urination; passes small quantity with partial relief",
-                "Extremely chilly; sensitive to drafts of cold air; cannot uncover without shivering",
-                "Morning aggravation; wakes at 3:00 AM thinking of work, sleeps late and wakes tired"
-            ),
-            inimicalRemedies = listOf("Ign"),
-            complementaryRemedies = listOf("Sulph", "Sep", "Kali-c"),
-            antidoteRemedies = listOf("Acon", "Bell", "Camph", "Cham")
-        ),
-        Remedy(
-            id = "sulph",
-            abbreviation = "Sulph",
-            fullName = "Sulphur",
-            commonName = "Sublimed Sulphur",
-            thermalState = ThermalState.HOT,
-            dominantMiasm = Miasm.PSORA,
-            keynotes = listOf(
-                "The great antipsoric; philosophical, ragged theorist; aversion to bathing and washing",
-                "Burning sensations everywhere: soles of feet stuck out of covers in bed, crown of head",
-                "Weak, empty, faint goneness in epigastrium at 11:00 AM; cannot wait for lunch",
-                "Morning diarrhea drives out of bed at 5:00 AM with urgency",
-                "Skin eruptions itchy, voluptuous scratch, burns after scratching; worse warm bed"
-            ),
-            inimicalRemedies = listOf(),
-            complementaryRemedies = listOf("Aloe", "Psor", "Acon", "Nux-v"),
-            antidoteRemedies = listOf("Acon", "Camph", "Cham", "Chin", "Merc")
-        ),
-        Remedy(
-            id = "calc_c",
-            abbreviation = "Calc",
-            fullName = "Calcarea Carbonica",
-            commonName = "Oyster Shell Carbonate of Lime",
-            thermalState = ThermalState.CHILLY,
-            dominantMiasm = Miasm.PSORA,
-            keynotes = listOf(
-                "Fair, fat, flabby, perspires profusely, especially on back of neck and head during sleep",
-                "Extremely chilly, cold damp feet feel like wet stockings; worse cold wet weather",
-                "Craves boiled eggs, sweets, indigestible things (chalk, pencils, earth); milk disagrees",
-                "Great apprehension of losing mind or that people will observe mental confusion",
-                "Physical exertion easily causes shortness of breath and profuse exhaustion"
-            ),
-            inimicalRemedies = listOf(),
-            complementaryRemedies = listOf("Bell", "Rhus-t", "Lyc", "Sil"),
-            antidoteRemedies = listOf("Camph", "Ip", "Nit-ac", "Nux-v")
-        ),
-        Remedy(
-            id = "apis",
-            abbreviation = "Apis",
-            fullName = "Apis Mellifica",
-            commonName = "Honey Bee",
-            thermalState = ThermalState.HOT,
-            dominantMiasm = Miasm.SYCOSIS,
-            keynotes = listOf(
-                "Stinging, burning, pricking pains with acute edematous, puffy, rosy swelling",
-                "Complete thirstlessness in acute dropsical conditions, cystitis, and fevers",
-                "Aggravated by all forms of heat, warm room, fire; ameliorated by cold water applications",
-                "Extreme jealousy, awkwardness, drops things from hands; high-pitched cri encéphalique in sleep"
-            ),
-            inimicalRemedies = listOf("Rhus-t"), // STRICTLY INIMICAL TO RHUS TOX!
-            complementaryRemedies = listOf("Nat-m", "Bar-c", "Puls"),
-            antidoteRemedies = listOf("Canth", "Ipec", "Lach", "Led")
-        ),
-        Remedy(
-            id = "rhus_t",
-            abbreviation = "Rhus-t",
-            fullName = "Rhus Toxicodendron",
-            commonName = "Poison Ivy",
-            thermalState = ThermalState.CHILLY,
-            dominantMiasm = Miasm.PSORA,
-            keynotes = listOf(
-                "Ailments from getting wet while perspiring, sprains, over-lifting, sleeping on damp ground",
-                "Great physical restlessness; cannot lie still; must constantly shift position",
-                "First motion is extremely painful and stiff; continued gentle motion brings relief",
-                "Aggravated in damp rainy cold weather, rest, and beginning of movement; amel warm dry heat",
-                "Red triangular tip of tongue; metallic taste; dreams of intense physical exertion"
-            ),
-            inimicalRemedies = listOf("Apis"), // STRICTLY INIMICAL TO APIS!
-            complementaryRemedies = listOf("Bry", "Calc", "Med", "Phyt"),
-            antidoteRemedies = listOf("Anac", "Bell", "Bry", "Camph", "Graph")
-        ),
-        Remedy(
-            id = "bry",
-            abbreviation = "Bry",
-            fullName = "Bryonia Alba",
-            commonName = "White Bryony",
-            thermalState = ThermalState.HOT,
-            dominantMiasm = Miasm.PSORA,
-            keynotes = listOf(
-                "Aggravation from the least motion; absolute relief from complete absolute rest",
-                "Ameliorated by firm pressure and lying on the painful side",
-                "Excessive dryness of all mucous membranes; lips parched cracked, dry hard burnt stools",
-                "Thirst for large quantities of cold water at long intervals",
-                "Irritable, business delirium; talks constantly of his business during fever"
-            ),
-            inimicalRemedies = listOf(),
-            complementaryRemedies = listOf("Alum", "Rhus-t", "Kali-c"),
-            antidoteRemedies = listOf("Acon", "Camph", "Cham", "Ign", "Nux-v")
-        ),
-        Remedy(
-            id = "sep",
-            abbreviation = "Sep",
-            fullName = "Sepia Succus",
-            commonName = "Inky Juice of Cuttlefish",
-            thermalState = ThermalState.CHILLY,
-            dominantMiasm = Miasm.SYCOSIS,
-            keynotes = listOf(
-                "Complete emotional indifference and apathy to loved ones, family, occupation",
-                "Bearing-down sensation in pelvis as if everything would protrude; must cross legs",
-                "Yellow saddle across bridge of nose and cheeks (chloasma)",
-                "Aversion to meat, bread, and fat; desire for vinegar, pickles, acids, spicy food",
-                "Ameliorated by vigorous violent physical exercise (aerobics, fast dancing)"
-            ),
-            inimicalRemedies = listOf("Lach"),
-            complementaryRemedies = listOf("Nat-m", "Puls", "Sulph"),
-            antidoteRemedies = listOf("Acon", "Ant-c", "Ant-t", "Bell")
-        ),
-        Remedy(
-            id = "sil",
-            abbreviation = "Sil",
-            fullName = "Silicea Terra",
-            commonName = "Pure Flint",
-            thermalState = ThermalState.CHILLY,
-            dominantMiasm = Miasm.SYPHILIS,
-            keynotes = listOf(
-                "Lack of grit, timid, yields easily, dreads failure, yet capable when challenged",
-                "Extreme chilliness, wants warm wraps around head; aversion to drafts",
-                "Offensive, sour, acrid foot sweat with suppressed perspiration causing complaints",
-                "Promotes expulsion of foreign bodies, splinters, ingrown nails, deep fistulae",
-                "Constipation: stool recedes after being partially expelled (bashful stool)"
-            ),
-            inimicalRemedies = listOf("Merc"), // INIMICAL TO MERCURIUS!
-            complementaryRemedies = listOf("Thuj", "Sanic", "Flu-ac"),
-            antidoteRemedies = listOf("Camph", "Fl-ac", "Hep")
-        ),
-        Remedy(
-            id = "ign",
-            abbreviation = "Ign",
-            fullName = "Ignatia Amara",
-            commonName = "St. Ignatius Bean",
-            thermalState = ThermalState.AMBITHERMAL,
-            dominantMiasm = Miasm.PSORA,
-            keynotes = listOf(
-                "Acute emotional grief, heartbreak, bad news, sudden bereavement",
-                "Rapidly alternating moods, contradictory symptoms; tears turn to laughter",
-                "Frequent involuntary deep sighing; sensation of a lump in throat (globus hystericus)",
-                "Sore throat better swallowing solids; headache relieved by lying on painful side",
-                "Cannot tolerate tobacco smoke or coffee"
-            ),
-            inimicalRemedies = listOf("Coff", "Nux-v", "Tab"),
-            complementaryRemedies = listOf("Nat-m", "Sep", "Zinc"),
-            antidoteRemedies = listOf("Arn", "Camph", "Cham", "Cocc", "Puls")
-        ),
-        Remedy(
-            id = "lach",
-            abbreviation = "Lach",
-            fullName = "Lachesis Mutus",
-            commonName = "Surukuku Bushmaster Snake Venom",
-            thermalState = ThermalState.HOT,
-            dominantMiasm = Miasm.SYPHILIS,
-            keynotes = listOf(
-                "Left-sided affections or beginning on left side and spreading to right",
-                "Extreme intolerance of constricting collars, tight neck bands, waistband",
-                "Aggravation after sleep; sleeps into aggravation; wakes with suffocative paroxysms",
-                "Tremendous loquacity, jumps rapidly from one topic to another without pause",
-                "Purplish, bluish, dark mottled appearance of affected tissues and throat"
-            ),
-            inimicalRemedies = listOf("Sep", "Dulc", "Psor"),
-            complementaryRemedies = listOf("Lyc", "Hep", "Nit-ac"),
-            antidoteRemedies = listOf("Alum", "Ars", "Bell", "Camph")
-        ),
-        Remedy(
-            id = "caust",
-            abbreviation = "Caust",
-            fullName = "Causticum Hahnemanni",
-            commonName = "Tinctura acris sine Kali",
-            thermalState = ThermalState.CHILLY,
-            dominantMiasm = Miasm.SYCOSIS,
-            keynotes = listOf(
-                "Intense empathy for the suffering of others; cannot endure injustice or tyranny",
-                "Paralytic weakness of single organs (facial nerve, vocal cords, bladder sphincter)",
-                "Involuntary urination while coughing, sneezing, laughing, or blowing nose",
-                "Ameliorated in damp wet rainy weather; worse in clear fine dry cold weather",
-                "Raw burning soreness in trachea with difficult hoarseness"
-            ),
-            inimicalRemedies = listOf("Phos", "Coff"), // INIMICAL TO PHOSPHORUS!
-            complementaryRemedies = listOf("Carb-v", "Petros", "Staph"),
-            antidoteRemedies = listOf("Asaf", "Coff", "Coloc", "Nux-v", "Spir-nit-d")
-        ),
-        Remedy(
-            id = "merc_sol",
-            abbreviation = "Merc",
-            fullName = "Mercurius Solubilis",
-            commonName = "Quicksilver / Hahnemann's Soluble Mercury",
-            thermalState = ThermalState.AMBITHERMAL,
-            dominantMiasm = Miasm.SYPHILIS,
-            keynotes = listOf(
-                "Human thermometer: sensitive to both extreme cold and extreme heat",
-                "Profuse, oily, nocturnal perspiration that affords no relief whatsoever",
-                "Flabby, swollen tongue showing deep indents of teeth on lateral borders",
-                "Tremendous salivation with metallic sweetish taste and offensive fetid breath",
-                "Nocturnal bone pains, bone suppuration, ulcerations with ragged edges"
-            ),
-            inimicalRemedies = listOf("Sil"), // INIMICAL TO SILICEA!
-            complementaryRemedies = listOf("Bad", "Bell", "Hep"),
-            antidoteRemedies = listOf("Aur", "Bell", "Camph", "Chin", "Dulc", "Hep", "Iod", "Nit-ac", "Staph", "Sulph")
-        ),
-        Remedy(
-            id = "thuj",
-            abbreviation = "Thuj",
-            fullName = "Thuja Occidentalis",
-            commonName = "Arbor Vitae / Tree of Life",
-            thermalState = ThermalState.CHILLY,
-            dominantMiasm = Miasm.SYCOSIS,
-            keynotes = listOf(
-                "The king of antisycotics; fig-warts, condylomata, polypi, excrescences",
-                "Ailments from suppressed gonorrhea, bad effects of vaccination (vaccinosis)",
-                "Delusion of limbs made of glass that would break easily; something alive in abdomen",
-                "Perspiration sweet-smelling like honey, exclusively on uncovered parts",
-                "Splitting headache like a nail driven into parietal bone"
-            ),
-            inimicalRemedies = listOf(),
-            complementaryRemedies = listOf("Med", "Nat-s", "Sil", "Sabin"),
-            antidoteRemedies = listOf("Cham", "Cocc", "Merc", "Puls", "Sulph")
-        ),
-        Remedy(
-            id = "staph",
-            abbreviation = "Staph",
-            fullName = "Staphysagria",
-            commonName = "Stavesacre",
-            thermalState = ThermalState.CHILLY,
-            dominantMiasm = Miasm.SYCOSIS,
-            keynotes = listOf(
-                "Ailments from suppressed indignation, mortification, insult, suppressed anger",
-                "Trembling with anger; throws things at people or suppresses fury with trembling",
-                "Honeymoon cystitis: burning in urethra when not urinating; sensation of drop rolling",
-                "Styes on eyelids leaving hard chalazions; crumbling carious teeth with black rims",
-                "Surgical incised wounds with intense cutting stitching pain"
-            ),
-            inimicalRemedies = listOf(),
-            complementaryRemedies = listOf("Caust", "Coloc"),
-            antidoteRemedies = listOf("Camph")
-        ),
-        Remedy(
-            id = "bell",
-            abbreviation = "Bell",
-            fullName = "Belladonna",
-            commonName = "Deadly Nightshade",
-            thermalState = ThermalState.HOT,
-            dominantMiasm = Miasm.PSORA,
-            keynotes = listOf(
-                "Sudden, violent, stormy onset of symptoms; acute congestions and high pyrexia",
-                "Flushed red face, throbbing carotids, dilated pupils, glazed staring eyes",
-                "Throbbing hammering headache, worse jarring of bed, touch, bright light, draft",
-                "Throat crimson red, swollen, swallowing difficult, worse right side",
-                "Hallucinations of monsters, black dogs, strikes and bites attendants"
-            ),
-            inimicalRemedies = listOf(),
-            complementaryRemedies = listOf("Calc", "Hep", "Merc"),
-            antidoteRemedies = listOf("Camph", "Coff", "Hep", "Hyos", "Op", "Puls")
-        )
-    )
+    // ─── Reference Data (delegated) ─────────────────────────────────────────
+    val polychrests: List<Remedy>
+        get() = PolychrestDatabase.all
 
-    // Master Canonical Rubrics Database
-    val rubrics: List<Rubric> = listOf(
-        Rubric(
-            id = "r_mind_grief",
-            chapter = "MIND",
-            name = "Ailments from grief, sorrow, disappointed love",
-            remedyGrades = mapOf("Nat-m" to 3, "Ign" to 3, "Ph-ac" to 3, "Staph" to 2, "Caust" to 2, "Puls" to 2),
-            isPqrs = true,
-            weight = 3
-        ),
-        Rubric(
-            id = "r_mind_consolation_agg",
-            chapter = "MIND",
-            name = "Consolation aggravates",
-            remedyGrades = mapOf("Nat-m" to 3, "Sil" to 2, "Ign" to 2, "Sep" to 2, "Ars" to 1),
-            isPqrs = true,
-            weight = 3
-        ),
-        Rubric(
-            id = "r_mind_weeping_easily",
-            chapter = "MIND",
-            name = "Weeping tearful mood, easily while narrating",
-            remedyGrades = mapOf("Puls" to 3, "Nat-m" to 2, "Sep" to 2, "Ign" to 2, "Med" to 1),
-            weight = 2
-        ),
-        Rubric(
-            id = "r_mind_fear_alone",
-            chapter = "MIND",
-            name = "Fear of being alone",
-            remedyGrades = mapOf("Ars" to 3, "Phos" to 3, "Kali-c" to 2, "Lyc" to 2, "Puls" to 1),
-            weight = 2
-        ),
-        Rubric(
-            id = "r_mind_anger_suppressed",
-            chapter = "MIND",
-            name = "Ailments from suppressed anger and indignation",
-            remedyGrades = mapOf("Staph" to 3, "Coloc" to 3, "Ign" to 2, "Cham" to 2, "Nux-v" to 2),
-            isPqrs = true,
-            weight = 3
-        ),
-        Rubric(
-            id = "r_head_sun_agg",
-            chapter = "HEAD",
-            name = "Headache aggravated by heat of sun",
-            remedyGrades = mapOf("Nat-m" to 3, "Glon" to 3, "Bell" to 3, "Lach" to 2, "Bry" to 2),
-            isPqrs = true,
-            weight = 3
-        ),
-        Rubric(
-            id = "r_head_motion_agg",
-            chapter = "HEAD",
-            name = "Headache aggravated from least motion",
-            remedyGrades = mapOf("Bry" to 3, "Bell" to 3, "Sil" to 2, "Nat-m" to 2, "Nux-v" to 2),
-            weight = 2
-        ),
-        Rubric(
-            id = "r_head_hammering",
-            chapter = "HEAD",
-            name = "Throbbing hammering headache, as if bursting",
-            remedyGrades = mapOf("Bell" to 3, "Nat-m" to 3, "Glon" to 3, "Bry" to 2, "Sulph" to 2),
-            weight = 2
-        ),
-        Rubric(
-            id = "r_stomach_salt_craving",
-            chapter = "STOMACH",
-            name = "Desire for salt and salty food",
-            remedyGrades = mapOf("Nat-m" to 3, "Phos" to 2, "Verat" to 2, "Caust" to 2, "Thuj" to 1),
-            isPqrs = true,
-            weight = 2
-        ),
-        Rubric(
-            id = "r_stomach_thirst_small_sips",
-            chapter = "STOMACH",
-            name = "Thirst for small quantities frequently",
-            remedyGrades = mapOf("Ars" to 3, "Bell" to 2, "Phos" to 2, "Hyos" to 2, "Chin" to 1),
-            isPqrs = true,
-            weight = 3
-        ),
-        Rubric(
-            id = "r_stomach_thirstless",
-            chapter = "STOMACH",
-            name = "Thirstlessness with complaints",
-            remedyGrades = mapOf("Puls" to 3, "Apis" to 3, "Gels" to 2, "Nux-m" to 2, "Sep" to 1),
-            weight = 2
-        ),
-        Rubric(
-            id = "r_stomach_bloating_4_8pm",
-            chapter = "STOMACH",
-            name = "Abdomen distension, flatulence 4:00 PM to 8:00 PM",
-            remedyGrades = mapOf("Lyc" to 3, "Coloc" to 2, "Carb-v" to 2, "Nux-v" to 1),
-            isPqrs = true,
-            weight = 3
-        ),
-        Rubric(
-            id = "r_stomach_warm_drinks_amel",
-            chapter = "STOMACH",
-            name = "Stomach pain ameliorated by hot warm drinks",
-            remedyGrades = mapOf("Lyc" to 3, "Ars" to 3, "Mag-p" to 3, "Chel" to 2, "Nux-v" to 2),
-            weight = 2
-        ),
-        Rubric(
-            id = "r_stomach_cold_drinks_vomit_warm",
-            chapter = "STOMACH",
-            name = "Vomits cold water as soon as it warms in stomach",
-            remedyGrades = mapOf("Phos" to 3, "Ars" to 2, "Bism" to 2),
-            isPqrs = true,
-            weight = 3
-        ),
-        Rubric(
-            id = "r_gen_open_air_amel",
-            chapter = "GENERALITIES",
-            name = "Generalities, open cool air ameliorates",
-            remedyGrades = mapOf("Puls" to 3, "Kali-bi" to 2, "Nat-m" to 2, "Sabin" to 2, "Apis" to 2),
-            weight = 2
-        ),
-        Rubric(
-            id = "r_gen_restless_anxiety",
-            chapter = "GENERALITIES",
-            name = "Restlessness physical with anxiety and exhaustion",
-            remedyGrades = mapOf("Ars" to 3, "Rhus-t" to 3, "Acon" to 3, "Bell" to 2, "Phos" to 2),
-            isPqrs = true,
-            weight = 3
-        ),
-        Rubric(
-            id = "r_gen_motion_first_agg_cont_amel",
-            chapter = "GENERALITIES",
-            name = "First motion aggravates, continued motion ameliorates",
-            remedyGrades = mapOf("Rhus-t" to 3, "Con" to 2, "Ferr" to 2, "Lyc" to 1),
-            isPqrs = true,
-            weight = 3
-        ),
-        Rubric(
-            id = "r_gen_wet_weather_agg",
-            chapter = "GENERALITIES",
-            name = "Ailments from damp wet weather, getting wet",
-            remedyGrades = mapOf("Rhus-t" to 3, "Dulc" to 3, "Nat-s" to 3, "Calc" to 2, "Rhod" to 2),
-            weight = 2
-        ),
-        Rubric(
-            id = "r_gen_ineffectual_urging",
-            chapter = "RECTUM",
-            name = "Frequent ineffectual urging to stool",
-            remedyGrades = mapOf("Nux-v" to 3, "Sulph" to 2, "Ign" to 2, "Anac" to 2, "Lyc" to 1),
-            weight = 2
-        ),
-        Rubric(
-            id = "r_gen_suppressed_eruption",
-            chapter = "SKIN",
-            name = "Ailments from suppressed skin eruptions",
-            remedyGrades = mapOf("Sulph" to 3, "Psor" to 3, "Zinc" to 2, "Ars" to 2, "Caust" to 2),
-            isPqrs = true,
-            weight = 3
-        )
-    )
+    val rubrics: List<Rubric>
+        get() = RubricDatabase.all
+
+    // QA-suite API surface (docs/engineering/testing-qa-strategy.md)
+    val allPolychrests: List<Remedy>
+        get() = PolychrestDatabase.all
+
+    val allRubrics: List<Rubric>
+        get() = RubricDatabase.all
 
     // Doctor Silent Observation Presets
     val doctorObservationOptions: List<DoctorObservationOption> = listOf(
@@ -579,6 +84,9 @@ object HomeopathyKnowledgeEngine {
             else -> null
         }
     }
+
+    // QA-suite API surface
+    fun checkRedFlag(text: String): RedFlagAlert? = screenForRedFlags(text)
 
     // Natural Language / Vernacular Utterance to LSMC Symptom & Rubric Parser
     fun parseUtteranceToSymptom(utterance: String): Symptom {
@@ -761,13 +269,30 @@ object HomeopathyKnowledgeEngine {
         return questions.take(3)
     }
 
-    // Dynamic Repertorization Matrix Calculation
+    // ─── Multi-School Repertorization (docs/02 §4) ──────────────────────────
+    private fun schoolMultiplier(rubric: Rubric, school: RepertorySchool): Double = when (school) {
+        RepertorySchool.KENT -> when (rubric.chapter) {
+            "MIND" -> 3.0
+            "GENERALITIES" -> 2.0
+            else -> 1.0
+        }
+        RepertorySchool.BOENNINGHAUSEN -> {
+            if (rubric.name.contains("ameliorat", ignoreCase = true) || rubric.name.contains("aggravat", ignoreCase = true)) {
+                2.5
+            } else 1.5
+        }
+        RepertorySchool.BOGER -> if (rubric.isPqrs) 3.0 else 1.5
+    }
+
     fun calculateRepertorization(
         activeRubrics: List<Rubric>,
         school: RepertorySchool = RepertorySchool.KENT,
         eliminateThermal: ThermalState? = null
     ): List<RemedyScore> {
         val scores = mutableListOf<RemedyScore>()
+
+        // Theoretical maximum for a remedy scoring grade 3 on every active rubric
+        val maxPossible = activeRubrics.sumOf { (3 * it.weight * schoolMultiplier(it, school)).toInt() }
 
         for (remedy in polychrests) {
             // Apply thermal elimination filter if active
@@ -787,29 +312,14 @@ object HomeopathyKnowledgeEngine {
                     rubricsCovered++
                     gradeSum += grade
 
-                    // School Multiplier logic
-                    val schoolMultiplier = when (school) {
-                        RepertorySchool.KENT -> {
-                            when (rubric.chapter) {
-                                "MIND" -> 3.0
-                                "GENERALITIES" -> 2.0
-                                else -> 1.0
-                            }
-                        }
-                        RepertorySchool.BOENNINGHAUSEN -> {
-                            if (rubric.name.contains("ameliorat", ignoreCase = true) || rubric.name.contains("aggravat", ignoreCase = true)) {
-                                2.5
-                            } else 1.5
-                        }
-                        RepertorySchool.BOGER -> {
-                            if (rubric.isPqrs) 3.0 else 1.5
-                        }
-                    }
-
-                    val rubricContribution = (grade * rubric.weight * schoolMultiplier).toInt()
+                    val rubricContribution = (grade * rubric.weight * schoolMultiplier(rubric, school)).toInt()
                     totalWeightedScore += rubricContribution
                 }
             }
+
+            val confidencePercent = if (maxPossible > 0) {
+                (100 * totalWeightedScore / maxPossible).coerceIn(0, 100)
+            } else 0
 
             scores.add(
                 RemedyScore(
@@ -817,7 +327,8 @@ object HomeopathyKnowledgeEngine {
                     totalScore = totalWeightedScore,
                     rubricsCovered = rubricsCovered,
                     totalRubrics = activeRubrics.size,
-                    gradeSum = gradeSum
+                    gradeSum = gradeSum,
+                    confidencePercent = confidencePercent
                 )
             )
         }
@@ -829,7 +340,17 @@ object HomeopathyKnowledgeEngine {
         )
     }
 
-    // Inimical Drug Conflict Checker
+    // QA-suite API surface
+    fun repertorize(activeRubrics: List<Rubric>): List<RemedyScore> =
+        calculateRepertorization(activeRubrics, RepertorySchool.KENT)
+
+    fun repertorizeWithSchool(
+        activeRubrics: List<Rubric>,
+        school: RepertorySchool,
+        eliminateThermal: ThermalState? = null
+    ): List<RemedyScore> = calculateRepertorization(activeRubrics, school, eliminateThermal)
+
+    // Inimical Drug Conflict Checker (docs/02 §5)
     fun checkInimicalConflict(primaryRemedy: Remedy, candidateRemedy: Remedy): Pair<Boolean, String> {
         if (primaryRemedy.inimicalRemedies.contains(candidateRemedy.abbreviation) ||
             candidateRemedy.inimicalRemedies.contains(primaryRemedy.abbreviation)) {
@@ -839,7 +360,70 @@ object HomeopathyKnowledgeEngine {
         return Pair(false, "")
     }
 
-    // Evaluate Hering's Law of Cure
+    // QA-suite API surface (string-based lookup)
+    fun checkInimicalCompatibility(remedyA: String, remedyB: String): String? {
+        val a = polychrests.find { it.abbreviation.equals(remedyA, ignoreCase = true) } ?: return null
+        val b = polychrests.find { it.abbreviation.equals(remedyB, ignoreCase = true) } ?: return null
+        val (isConflict, _) = checkInimicalConflict(a, b)
+        return if (isConflict) {
+            "DANGEROUS INIMICAL COMBINATION: ${a.abbreviation} and ${b.abbreviation} are strictly inimical — never prescribe in succession or combine them."
+        } else null
+    }
+
+    // ─── LM 50-Millesimal Posology Protocol (Organon §270-§272) ─────────────
+    fun calculateLmProtocol(potency: String, isHypersensitive: Boolean = false): LmProtocol {
+        val level = potency.trim().uppercase().removePrefix("LM").trim().toIntOrNull()?.coerceIn(1, 30) ?: 1
+        val succussions = if (isHypersensitive) 4 else 10
+        val name = "LM $level"
+        val source = if (level <= 1) "the LM mother tincture" else "the LM ${level - 1} medicinal solution"
+
+        return LmProtocol(
+            potency = name,
+            grainsOfMedicine = 4,
+            waterDrops = 10,
+            dilutionRatio = "1 : 50,000 (one grain : fifty thousand grains of water)",
+            succussions = succussions,
+            dilutionMethod = "Hahnemann's 2nd Cup Method: 4 grains of $source + 10 drops distilled water; succuss ${succussions} times",
+            doseInstructions = "Take 4 drops of the 2nd-cup solution under the tongue, fasting in the morning; prepare a fresh dilution each day",
+            splitDosing = if (isHypersensitive) {
+                "Hypersensitive constitution: single small morning sip only — do not split or repeat during the day"
+            } else {
+                "Chronic cases: split the daily 2nd-cup dose — half morning, half evening, never near meals"
+            }
+        )
+    }
+
+    // ─── Kent's 12 Prognostic Observations (J. H. Kent, Prognosis of Homeopathic Treatment) ───
+    val kentObservations: List<KentObservation>
+        get() = KentObservationDatabase.all
+
+    fun evaluateKentObservation(input: KentReactionInput): KentObservationResult {
+        val obs = when {
+            input.pattern == KentReactionPattern.NO_REACTION -> kentObservations[9]
+            input.pattern == KentReactionPattern.AGGRAVATION && input.severity == KentSeverity.VIOLENT -> kentObservations[6]
+            input.pattern == KentReactionPattern.AGGRAVATION && input.outcome == KentOutcome.DEEPENING -> kentObservations[11]
+            input.pattern == KentReactionPattern.AGGRAVATION && input.outcome == KentOutcome.RELAPSE -> kentObservations[5]
+            input.pattern == KentReactionPattern.AGGRAVATION &&
+                    input.duration == KentDuration.PROLONGED && input.outcome == KentOutcome.RAPID_IMPROVEMENT -> kentObservations[0]
+            input.pattern == KentReactionPattern.AGGRAVATION &&
+                    input.duration == KentDuration.SHORT && input.outcome == KentOutcome.RAPID_IMPROVEMENT -> kentObservations[2]
+            input.pattern == KentReactionPattern.AGGRAVATION && input.outcome == KentOutcome.SLOW_IMPROVEMENT -> kentObservations[3]
+            input.pattern == KentReactionPattern.AGGRAVATION -> kentObservations[1]
+            input.pattern == KentReactionPattern.AMELIORATION && input.oldSuppressedSymptomsReappeared -> kentObservations[7]
+            input.pattern == KentReactionPattern.AMELIORATION && input.outcome == KentOutcome.DEEPENING -> kentObservations[8]
+            input.pattern == KentReactionPattern.AMELIORATION && input.outcome == KentOutcome.RELAPSE -> kentObservations[5]
+            input.pattern == KentReactionPattern.AMELIORATION && input.outcome == KentOutcome.SLOW_IMPROVEMENT -> kentObservations[10]
+            input.pattern == KentReactionPattern.AMELIORATION -> kentObservations[4]
+            else -> kentObservations[1]
+        }
+        return KentObservationResult(
+            observation = obs,
+            action = obs.action,
+            summary = "Kent Observation ${obs.number}: ${obs.title} — ${obs.action.label}"
+        )
+    }
+
+    // Evaluate Hering's Law of Cure (docs/02 §6)
     fun evaluateHeringProgression(
         insideToOutside: Boolean,
         aboveDownwards: Boolean,
@@ -875,4 +459,84 @@ object HomeopathyKnowledgeEngine {
             )
         }
     }
+
+    // ─── Plain-Text Case Sheet & Prescription Generator (MVP MVE criterion 4) ───
+    fun generateCaseSheet(
+        patientName: String,
+        patientAge: Int,
+        patientSex: String,
+        thermal: ThermalState,
+        miasm: Miasm,
+        chiefComplaint: String,
+        caseMode: String,
+        symptoms: List<Symptom>,
+        activeRubrics: List<Rubric>,
+        remedyScores: List<RemedyScore>,
+        rxRemedy: String,
+        rxPotency: String,
+        rxScale: String,
+        rxPosology: String,
+        dietaryRestrictions: List<String>,
+        hering: HeringEvaluation? = null,
+        lmProtocol: LmProtocol? = null
+    ): String {
+        val sb = StringBuilder()
+        sb.appendLine("═══════════════════════════════════════════════")
+        sb.appendLine("        SIMILIMUM AI — CLINICAL CASE SHEET")
+        sb.appendLine("═══════════════════════════════════════════════")
+        sb.appendLine()
+        sb.appendLine("PATIENT: $patientName, ${patientAge} ${patientSex}")
+        sb.appendLine("THERMAL: ${thermal.label()}   |   MIASM: ${miasm.name}")
+        sb.appendLine("CASE MODE: $caseMode")
+        sb.appendLine("CHIEF COMPLAINT: $chiefComplaint")
+        sb.appendLine()
+        sb.appendLine("── SYMPTOM TOTALITY (LSMC) ──────────────────")
+        if (symptoms.isEmpty()) {
+            sb.appendLine("(No symptoms recorded)")
+        }
+        symptoms.forEachIndexed { i, s ->
+            sb.appendLine("${i + 1}. [${s.location}] ${s.sensation} (intensity ${s.intensity}/3${if (s.isPqrs) " — PQRS §153" else ""})")
+            if (s.modalities.isNotBlank()) sb.appendLine("   Modality: ${s.modalities}")
+            if (s.concomitants.isNotBlank()) sb.appendLine("   Concomitant: ${s.concomitants}")
+        }
+        sb.appendLine()
+        sb.appendLine("── ACTIVE REPERTORY RUBRICS (${activeRubrics.size}) ────────────")
+        activeRubrics.forEachIndexed { i, r ->
+            val pqrsTag = if (r.isPqrs) "  [PQRS]" else ""
+            sb.appendLine("${i + 1}. ${r.path} (w${r.weight})$pqrsTag")
+        }
+        sb.appendLine()
+        sb.appendLine("── TOP SIMILIMUM CANDIDATES ──────────────────")
+        remedyScores.filter { it.totalScore > 0 }.take(5).forEachIndexed { i, s ->
+            sb.appendLine("${i + 1}. ${s.remedy.fullName.padEnd(28)} score=${s.totalScore}  coverage=${s.rubricsCovered}/${s.totalRubrics}  confidence=${s.confidencePercent}%")
+        }
+        if (remedyScores.none { it.totalScore > 0 }) sb.appendLine("(No active rubrics scored)")
+        sb.appendLine()
+        sb.appendLine("── PRESCRIPTION (Organon §245-§285) ──────────")
+        sb.appendLine("REMEDY: $rxRemedy $rxPotency  [$rxScale scale]")
+        sb.appendLine("POSOLOGY: $rxPosology")
+        lmProtocol?.let { lm ->
+            sb.appendLine("LM PROTOCOL: ${lm.dilutionMethod}; ${lm.succussions} succussions; ratio ${lm.dilutionRatio}")
+            sb.appendLine("  Dose: ${lm.doseInstructions}")
+            sb.appendLine("  Split dosing: ${lm.splitDosing}")
+        }
+        sb.appendLine("DIETARY PROHIBITIONS: ${dietaryRestrictions.joinToString(", ")}")
+        hering?.let { h ->
+            sb.appendLine()
+            sb.appendLine("── HERING'S LAW (follow-up) ──────────────────")
+            sb.appendLine("VERDICT: ${h.prognosisVerdict}")
+            sb.appendLine("GUIDANCE: ${h.clinicalGuidance}")
+        }
+        sb.appendLine()
+        sb.appendLine("This case sheet was generated by Similimum AI as clinical")
+        sb.appendLine("decision support. Final prescription remains the doctor's")
+        sb.appendLine("professional judgment per classical Homeopathic practice.")
+        return sb.toString()
+    }
+}
+
+private fun ThermalState.label(): String = when (this) {
+    ThermalState.CHILLY -> "Chilly (Sensitive to Cold)"
+    ThermalState.HOT -> "Hot / Warm-Blooded (Sensitive to Heat)"
+    ThermalState.AMBITHERMAL -> "Ambithermal (Sensitive to both)"
 }

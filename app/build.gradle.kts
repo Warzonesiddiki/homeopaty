@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.secrets)
@@ -11,7 +12,8 @@ android {
 
     defaultConfig {
         applicationId = "com.aistudio.similimumai.cplhqz"
-        minSdk = 26
+        // Docs (Master Index & MVP Scope): Android SDK 24 (Android 7.0) minimum
+        minSdk = 24
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -19,14 +21,9 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    signingConfigs {
-        getByName("debug") {
-            storeFile = file("${rootDir}/debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
-        }
-    }
+    // Debug signing uses the default AGP-generated debug keystore (~/.android/debug.keystore).
+    // A project-local debug.keystore was previously referenced but never committed,
+    // which broke the build; removing the override restores the standard behavior.
 
     buildTypes {
         release {
@@ -36,14 +33,15 @@ android {
                 "proguard-rules.pro"
             )
         }
-        debug {
-            signingConfig = signingConfigs.getByName("debug")
-        }
     }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    kotlinOptions {
+        jvmTarget = "21"
     }
 
     buildFeatures {
@@ -68,10 +66,14 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.kotlinx.coroutines.android)
 
     // Room Database
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    // Tier 1: Local JVM clinical invariant tests (docs/engineering/testing-qa-strategy.md)
+    testImplementation(libs.junit)
 }

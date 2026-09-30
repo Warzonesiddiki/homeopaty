@@ -37,3 +37,30 @@ Similimum AI is an ambient clinical homeopathy co-pilot designed for classical a
 6. **Gemini 2.5 Flash Cloud AI Integration**:
    - Deep constitutional synthesis and miasmatic deconvolution when API key is configured.
    - 100% functional offline fallback powered by local deterministic homeopathy knowledge engine.
+
+7. **Follow-Up & Prognosis Toolkit**:
+   - LM 50-Millesimal (LM1–LM30) dilution protocol calculator (2nd Cup Method, succussion count, split dosing).
+   - Kent's 12 Prognostic Observations evaluator with actionable clinical next steps (Sac Lac / Repeat / Increase / Antidote / Change).
+   - Hering's Law 4-vector directional cure tracker.
+   - One-tap plain-text Case Sheet + prescription clipboard export.
+
+## Build & Test
+
+Requires JDK 21, Android SDK 36 (compileSdk) — build via Android Studio or Gradle 8.7+/9.x:
+
+```bash
+# Debug APK
+gradle :app:assembleDebug
+
+# Tier 1 local JVM clinical invariant tests (docs/engineering/testing-qa-strategy.md):
+# red-flag triage, Kent/TPB repertorization ranking, inimical safety blockers,
+# LM dilution mathematics, Kent's 12 observations, knowledge-base size guarantees.
+gradle :app:testDebugUnitTest
+```
+
+The knowledge base ships with **30 classical polychrests** and **184 canonical rubrics**
+across Kentian chapters (docs/data/seed-data.md), fully offline.
+
+The optional Gemini cloud reasoning layer is enabled by setting `GEMINI_API_KEY`
+in `.env` (see `.env.example`); without a key the deterministic local engine
+provides 100% of the clinical functionality.

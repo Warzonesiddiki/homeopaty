@@ -225,6 +225,14 @@ fun RxHeringScreen(
             }
         }
 
+        // LM 50-Millesimal Dilution Protocol Calculator (docs/05 Phase 3, Organon §270-§272)
+        item {
+            LmDilutionCard(
+                uiState = uiState,
+                viewModel = viewModel
+            )
+        }
+
         // Hering's Law of Cure Evaluator Card
         item {
             Card(
@@ -331,6 +339,22 @@ fun RxHeringScreen(
                     }
                 }
             }
+        }
+
+        // Kent's 12 Prognostic Observations Follow-Up Evaluator
+        item {
+            KentObservationsCard(
+                uiState = uiState,
+                viewModel = viewModel
+            )
+        }
+
+        // Plain-text Case Sheet generator + case mode selector (MVP MVE criterion 4)
+        item {
+            CaseSheetCard(
+                uiState = uiState,
+                viewModel = viewModel
+            )
         }
 
         // Room Database Historical Records

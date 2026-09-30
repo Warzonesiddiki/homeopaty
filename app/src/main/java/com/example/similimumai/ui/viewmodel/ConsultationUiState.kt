@@ -58,6 +58,18 @@ data class ConsultationUiState(
     val heringEvaluation: HeringEvaluation? = null,
     val lastSavedSessionId: Long? = null,
 
+    // Case Mode (docs/data/enums.md)
+    val caseMode: CaseMode = CaseMode.CHRONIC,
+
+    // LM 50-Millesimal Dilution Calculator
+    val lmPotencyName: String = "LM1",
+    val lmHypersensitive: Boolean = false,
+    val lmProtocol: LmProtocol? = null,
+
+    // Kent's 12 Prognostic Observations
+    val kentInput: KentReactionInput = KentReactionInput(),
+    val kentObservationResult: KentObservationResult? = null,
+
     // AI & Intelligence
     val isGeminiAvailable: Boolean = false,
     val isAiAnalyzing: Boolean = false,
