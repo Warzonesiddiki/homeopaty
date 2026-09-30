@@ -3,7 +3,10 @@ package com.example.similimumai.data.engine
 import android.util.Log
 import com.example.similimumai.BuildConfig
 import com.example.similimumai.data.model.HighYieldQuestion
+import com.example.similimumai.data.model.RedFlagAlert
+import com.example.similimumai.data.model.Rubric
 import com.example.similimumai.data.model.Symptom
+import com.example.similimumai.data.model.UrgencyLevel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -43,17 +46,21 @@ class GeminiClinicalService {
             conn.readTimeout = 12000
             conn.doOutput = true
 
+            // Response schema per docs/03_TECHNICAL_ARCHITECTURE_AISTUDIO.md §4
             val systemInstruction = """
                 You are Similimum AI, an expert Classical Homeopathy Clinical Reasoning Engine adhering strictly to Hahnemann's Organon of Medicine (§83-§104, §153 PQRS) and Boenninghausen's Complete Symptom Doctrine (LSMC).
                 Analyze the patient-doctor consultation transcript and output a strict JSON object with:
                 {
-                   "constitutionalSummary": "Brief clinical synthesis of the patient's thermal, miasmatic, and emotional state",
-                   "dominantMiasm": "PSORA / SYCOSIS / SYPHILIS / TUBERCULAR",
-                   "thermalVerdict": "HOT / CHILLY / AMBITHERMAL",
-                   "pqrsCharacteristics": ["list of striking uncommon symptoms"],
+                   "detectedSymptoms": ["symptom 1 in patient's terms", "symptom 2"],
                    "highYieldQuestions": [
                       {"question": "clinical inquiry", "targetDimension": "Modality / Concomitant / Causation", "rationale": "clinical why"}
                    ],
+                   "suggestedRubrics": ["CHAPTER - canonical rubric name", "CHAPTER - canonical rubric name"],
+                   "redFlags": ["allopathic red flag condition if any, else empty array"],
+                   "miasmaticDominance": "PSORA / SYCOSIS / SYPHILIS / TUBERCULAR",
+                   "constitutionalSummary": "Brief clinical synthesis of the patient's thermal, miasmatic, and emotional state",
+                   "thermalVerdict": "HOT / CHILLY / AMBITHERMAL",
+                   "pqrsCharacteristics": ["list of striking uncommon symptoms"],
                    "topSimilimumCandidates": ["Remedy 1", "Remedy 2", "Remedy 3"]
                 }
             """.trimIndent()
@@ -92,8 +99,49 @@ class GeminiClinicalService {
 
                     val parsedData = JSONObject(rawAiText)
                     val constitutional = parsedData.optString("constitutionalSummary", "Classical totality synthesis")
-                    val dominantMiasm = parsedData.optString("dominantMiasm", "PSORA")
+                    val dominantMiasm = parsedData.optString("miasmaticDominance", parsedData.optString("dominantMiasm", "PSORA"))
                     val thermal = parsedData.optString("thermalVerdict", "AMBITHERMAL")
+
+                    // detectedSymptoms (doc 03 §4 schema)
+                    val symptomsOut = mutableListOf<String>()
+                    parsedData.optJSONArray("detectedSymptoms")?.let { arr ->
+                        for (i in 0 until arr.length()) symptomsOut.add(arr.optString(i))
+                    }
+
+                    // suggestedRubrics: match AI-suggested names against the canonical local database
+                    val suggestedRubricsOut = mutableListOf<Rubric>()
+                    parsedData.optJSONArray("suggestedRubrics")?.let { arr ->
+                        for (i in 0 until arr.length()) {
+                            val name = arr.optString(i)
+                            val match = HomeopathyKnowledgeEngine.rubrics.firstOrNull { r ->
+                                r.name.equals(name, ignoreCase = true) ||
+                                        r.path.contains(name.uppercase()) ||
+                                        name.contains(r.name, ignoreCase = true)
+                            }
+                            if (match != null && suggestedRubricsOut.none { it.id == match.id }) {
+                                suggestedRubricsOut.add(match)
+                            }
+                        }
+                    }
+
+                    // redFlags: escalate AI-detected emergencies as local alert objects
+                    val redFlagsOut = mutableListOf<RedFlagAlert>()
+                    parsedData.optJSONArray("redFlags")?.let { arr ->
+                        for (i in 0 until arr.length()) {
+                            val flag = arr.optString(i)
+                            if (flag.isNotBlank()) {
+                                redFlagsOut.add(
+                                    RedFlagAlert(
+                                        id = "rf_gemini_$i",
+                                        condition = flag,
+                                        matchedSymptoms = listOf("Cloud AI red-flag screening"),
+                                        urgencyLevel = UrgencyLevel.EMERGENCY,
+                                        immediateAction = "Immediate allopathic emergency evaluation required. Do not delay referral."
+                                    )
+                                )
+                            }
+                        }
+                    }
 
                     val questionsArray = parsedData.optJSONArray("highYieldQuestions")
                     val questions = mutableListOf<HighYieldQuestion>()
@@ -117,7 +165,10 @@ class GeminiClinicalService {
                         constitutionalSummary = constitutional,
                         dominantMiasm = dominantMiasm,
                         thermalVerdict = thermal,
-                        questions = if (questions.isNotEmpty()) questions else HomeopathyKnowledgeEngine.generateHighYieldQuestions(currentSymptoms)
+                        questions = if (questions.isNotEmpty()) questions else HomeopathyKnowledgeEngine.generateHighYieldQuestions(currentSymptoms),
+                        detectedSymptoms = symptomsOut,
+                        suggestedRubrics = suggestedRubricsOut,
+                        redFlags = redFlagsOut
                     )
                 }
             }
@@ -158,5 +209,8 @@ data class GeminiCaseAnalysisResult(
     val constitutionalSummary: String,
     val dominantMiasm: String,
     val thermalVerdict: String,
-    val questions: List<HighYieldQuestion>
+    val questions: List<HighYieldQuestion>,
+    val detectedSymptoms: List<String> = emptyList(),
+    val suggestedRubrics: List<Rubric> = emptyList(),
+    val redFlags: List<RedFlagAlert> = emptyList()
 )

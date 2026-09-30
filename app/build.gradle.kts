@@ -48,6 +48,12 @@ android {
         compose = true
         buildConfig = true
     }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 secrets {
@@ -76,4 +82,11 @@ dependencies {
 
     // Tier 1: Local JVM clinical invariant tests (docs/engineering/testing-qa-strategy.md)
     testImplementation(libs.junit)
+
+    // Tier 2: Robolectric component & lifecycle tests (ViewModel StateFlow, Room DAO, Speech Manager states)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.androidx.test.ext.junit)
+    testImplementation(libs.androidx.room.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

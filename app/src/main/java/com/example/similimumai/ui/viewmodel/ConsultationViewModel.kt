@@ -10,6 +10,7 @@ import com.example.similimumai.data.engine.GeminiClinicalService
 import com.example.similimumai.data.engine.HomeopathyKnowledgeEngine
 import com.example.similimumai.data.local.ConsultationDatabase
 import com.example.similimumai.data.local.entity.PatientEntity
+import com.example.similimumai.data.local.entity.PrescriptionEntity
 import com.example.similimumai.data.local.entity.SessionEntity
 import com.example.similimumai.data.model.*
 import com.example.similimumai.data.repository.ConsultationRepository
@@ -38,7 +39,7 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
 
     init {
         val database = ConsultationDatabase.getDatabase(application)
-        repository = ConsultationRepository(database.patientDao(), database.sessionDao())
+        repository = ConsultationRepository(database.patientDao(), database.sessionDao(), database.prescriptionDao())
 
         // Check Gemini status
         _uiState.update { it.copy(isGeminiAvailable = geminiService.isAvailable) }
@@ -54,6 +55,13 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
         viewModelScope.launch {
             repository.allSessions.collect { list ->
                 _uiState.update { it.copy(savedSessions = list) }
+            }
+        }
+
+        // Observe saved prescriptions from Room
+        viewModelScope.launch {
+            repository.allPrescriptions.collect { list ->
+                _uiState.update { it.copy(savedPrescriptions = list) }
             }
         }
 
@@ -399,6 +407,12 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
                     highYieldQuestions = result.questions
                 )
             }
+            // Apply AI-suggested rubrics (already matched to the canonical local database)
+            result.suggestedRubrics.forEach { addRubric(it) }
+            // Escalate AI-detected emergency red flags
+            result.redFlags.firstOrNull()?.let { redFlag ->
+                _uiState.update { it.copy(activeRedFlag = it.activeRedFlag ?: redFlag) }
+            }
         }
     }
 
@@ -428,6 +442,18 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
                 heringStatus = _uiState.value.heringEvaluation?.prognosisVerdict ?: "Not Evaluated"
             )
             val sessionId = repository.saveSession(session)
+
+            // Persist the prescription record (docs/03 §5: PrescriptionEntity)
+            val prescription = PrescriptionEntity(
+                sessionId = sessionId,
+                prescribedRemedy = _uiState.value.rxRemedyName,
+                potencyScale = _uiState.value.rxScale,
+                potency = _uiState.value.rxPotency,
+                posology = _uiState.value.rxPosology,
+                heringPrognosis = _uiState.value.heringEvaluation?.prognosisVerdict ?: "Not Evaluated"
+            )
+            repository.savePrescription(prescription)
+
             _uiState.update { it.copy(lastSavedSessionId = sessionId) }
         }
     }

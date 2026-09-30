@@ -90,7 +90,15 @@ class AudioSpeechManager(private val context: Context) {
 
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                // MVP scope: on-device recognition tuned for Indian clinics —
+                // en-IN (handles Hinglish) by default, hi-IN when the user's
+                // system language is Hindi.
+                val locale = if (Locale.getDefault().language == "hi") {
+                    Locale("hi", "IN")
+                } else {
+                    Locale("en", "IN")
+                }
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE, locale.toString())
                 putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
             }
             speechRecognizer?.startListening(intent)

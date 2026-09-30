@@ -1,6 +1,7 @@
 package com.example.similimumai.ui.viewmodel
 
 import com.example.similimumai.data.local.entity.PatientEntity
+import com.example.similimumai.data.local.entity.PrescriptionEntity
 import com.example.similimumai.data.local.entity.SessionEntity
 import com.example.similimumai.data.model.*
 import com.example.similimumai.data.speech.SimulatedCase
@@ -77,5 +78,6 @@ data class ConsultationUiState(
 
     // Room Database Saved Records
     val savedPatients: List<PatientEntity> = emptyList(),
-    val savedSessions: List<SessionEntity> = emptyList()
+    val savedSessions: List<SessionEntity> = emptyList(),
+    val savedPrescriptions: List<PrescriptionEntity> = emptyList()
 )
