@@ -122,6 +122,12 @@ enum class CaseMode(val label: String) {
     FOLLOW_UP("FOLLOW-UP (HERING)")
 }
 
+// Remote sync state for locally saved sessions (docs/ai/offline-strategy.md §2.4/§3)
+enum class SyncStatus {
+    PENDING, // written locally, awaiting CaseSyncWorker push
+    SYNCED   // acknowledged by the (future) backend
+}
+
 // Vision Lab: diagnostic visual inspection (docs/engineering/project-structure.md)
 enum class VisionPanel(val label: String) {
     TONGUE("Tongue Inspection"),

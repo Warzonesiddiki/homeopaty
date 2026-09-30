@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.similimumai.data.sync.SyncScheduler
 import com.example.similimumai.ui.components.MiniRemedyLeaderboard
 import com.example.similimumai.ui.components.RedFlagBanner
 import com.example.similimumai.ui.components.TopClinicalStatusBar
@@ -31,6 +32,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+        // 15-minute periodic case-sync sweep (docs/ai/offline-strategy.md §3)
+        SyncScheduler.schedulePeriodicSync(this)
 
         setContent {
             SimilimumAITheme {

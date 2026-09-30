@@ -661,8 +661,30 @@ private fun SavedSessionCard(session: SessionEntity, uiState: ConsultationUiStat
                 lastKentAction?.let {
                     HistoryStatChip("Kent: $it", AmberContainer, AmberOnContainer)
                 }
+                // offline-strategy.md §2.4: locally saved cases flagged PENDING
+                // until the WorkManager sync pipeline pushes them
+                if (session.syncStatus == "PENDING") {
+                    SyncPendingChip()
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun SyncPendingChip() {
+    Surface(
+        color = AmberContainer,
+        shape = RoundedCornerShape(6.dp),
+        modifier = Modifier.testTag("sync_pending_chip")
+    ) {
+        Text(
+            text = "PENDING SYNC",
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.SemiBold,
+            color = AmberOnContainer,
+            modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
+        )
     }
 }
 

@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.similimumai.data.model.SyncStatus
 
 /**
  * Consultation session (docs/data/schema.md table 3: cases).
@@ -37,5 +38,6 @@ data class SessionEntity(
     val heringStatus: String,
     val transcriptText: String = "",
     val clinicalNotes: String = "",
-    val repertorySchool: String = "KENT"
+    val repertorySchool: String = "KENT",
+    val syncStatus: String = SyncStatus.PENDING.name // PENDING until CaseSyncWorker pushes (offline-strategy.md §2.4)
 )

@@ -75,6 +75,9 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.kotlinx.coroutines.android)
 
+    // WorkManager — offline case sync pipeline (docs/ai/offline-strategy.md §3)
+    implementation(libs.androidx.work.runtime.ktx)
+
     // Room Database
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)

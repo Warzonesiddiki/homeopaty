@@ -22,6 +22,7 @@ import com.example.similimumai.data.local.entity.SessionEntity
 import com.example.similimumai.data.local.entity.SymptomRecordEntity
 import com.example.similimumai.data.model.*
 import com.example.similimumai.data.repository.ConsultationRepository
+import com.example.similimumai.data.sync.SyncScheduler
 import com.example.similimumai.data.validation.ClinicalValidationRules
 import com.example.similimumai.data.speech.AudioSpeechManager
 import com.example.similimumai.data.speech.ClinicalSimulator
@@ -75,8 +76,11 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
         try {
             connectivityManager.registerDefaultNetworkCallback(
                 object : ConnectivityManager.NetworkCallback() {
-                    override fun onAvailable(network: Network) =
+                    override fun onAvailable(network: Network) {
                         _uiState.update { it.copy(isOnline = true) }
+                        // one-shot sync on (re)connection — offline-strategy.md §3
+                        SyncScheduler.scheduleOneShotSync(application)
+                    }
 
                     override fun onLost(network: Network) =
                         _uiState.update { it.copy(isOnline = false) }
@@ -84,7 +88,9 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
                     override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
                         val online = caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
                             !caps.hasTransport(NetworkCapabilities.NET_CAPABILITY_NOT_VALIDATED)
+                        val wasOnline = _uiState.value.isOnline
                         _uiState.update { it.copy(isOnline = online) }
+                        if (online && !wasOnline) SyncScheduler.scheduleOneShotSync(application)
                     }
                 }
             ).also { networkCallback = it }

@@ -30,13 +30,14 @@ import com.example.similimumai.data.local.entity.SymptomRecordEntity
         DoctorEntity::class,
         CaseRubricEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 3, to = 4),
-        AutoMigration(from = 4, to = 5)
+        AutoMigration(from = 4, to = 5),
+        AutoMigration(from = 5, to = 6)
     ]
 )
 abstract class ConsultationDatabase : RoomDatabase() {

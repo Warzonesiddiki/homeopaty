@@ -17,6 +17,13 @@ interface SessionDao {
     fun getAllSessions(): Flow<List<SessionEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    // WorkManager sync pipeline (docs/ai/offline-strategy.md §3)
+    @Query("SELECT * FROM consultation_sessions WHERE syncStatus = 'PENDING' ORDER BY sessionDate ASC")
+    suspend fun getPendingSyncSessions(): List<SessionEntity>
+
+    @Query("UPDATE consultation_sessions SET syncStatus = :syncStatus WHERE id = :id")
+    suspend fun updateSyncStatus(id: Long, syncStatus: String)
+
     suspend fun insertSession(session: SessionEntity): Long
 
     @Delete
