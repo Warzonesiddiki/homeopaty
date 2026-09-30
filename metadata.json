@@ -1,0 +1,8 @@
+{
+  "name": "Similimum AI",
+  "description": "Ambient clinical homeopathy co-pilot with real-time repertorization, LSMC totality parser, and Gemini clinical reasoning",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

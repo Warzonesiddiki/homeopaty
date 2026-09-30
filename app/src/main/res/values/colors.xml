@@ -1,0 +1,11 @@
+<resources>
+    <color name="primary_emerald">#0D6E52</color>
+    <color name="primary_emerald_light">#D1FAE5</color>
+    <color name="accent_indigo">#3730A3</color>
+    <color name="accent_amber">#B45309</color>
+    <color name="accent_violet">#6D28D9</color>
+    <color name="crimson_red_flag">#DC2626</color>
+    <color name="slate_dark_bg">#0F172A</color>
+    <color name="slate_dark_surface">#1E293B</color>
+    <color name="off_white">#F8FAFC</color>
+</resources>
