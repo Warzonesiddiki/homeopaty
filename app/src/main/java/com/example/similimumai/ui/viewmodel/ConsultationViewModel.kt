@@ -19,6 +19,7 @@ import com.example.similimumai.data.local.entity.SessionEntity
 import com.example.similimumai.data.local.entity.SymptomRecordEntity
 import com.example.similimumai.data.model.*
 import com.example.similimumai.data.repository.ConsultationRepository
+import com.example.similimumai.data.validation.ClinicalValidationRules
 import com.example.similimumai.data.speech.AudioSpeechManager
 import com.example.similimumai.data.speech.ClinicalSimulator
 import com.example.similimumai.data.speech.SimulatedCase
@@ -363,14 +364,23 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun updatePrescription(remedy: String, potency: String, scale: String, posology: String) {
+        // §2.6 Inimical Check Rule: compare against the most recent saved prescription
+        val lastPrescribed = _uiState.value.savedPrescriptions.firstOrNull()?.prescribedRemedy
+        val conflict = ClinicalValidationRules.inimicalConflict(lastPrescribed, remedy)
         _uiState.update {
             it.copy(
                 rxRemedyName = remedy,
                 rxPotency = potency,
                 rxScale = scale,
-                rxPosology = posology
+                rxPosology = posology,
+                inimicalConflict = conflict,
+                inimicalJustification = if (conflict == null) "" else it.inimicalJustification
             )
         }
+    }
+
+    fun setInimicalJustification(text: String) {
+        _uiState.update { it.copy(inimicalJustification = text) }
     }
 
     fun setCaseMode(mode: CaseMode) {
@@ -387,7 +397,14 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
         phoneNumber: String,
         email: String
     ) {
+        // §2.1 Doctor registration validation — invalid profiles never reach Room
+        val errors = ClinicalValidationRules.validateDoctorProfile(fullName, registrationNumber, qualification)
+        if (errors.isNotEmpty()) {
+            _uiState.update { it.copy(doctorProfileError = errors.joinToString(" • ")) }
+            return
+        }
         viewModelScope.launch {
+            _uiState.update { it.copy(doctorProfileError = null) }
             repository.saveDoctor(
                 DoctorEntity(
                     fullName = fullName,
@@ -540,6 +557,26 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
     // Save Consultation Session to Room Database
     fun saveSessionToDatabase() {
         viewModelScope.launch {
+            // docs/data/validation-rules.md §2.2/§2.3 — gate persistence on data integrity
+            val state0 = _uiState.value
+            val integrityErrors = ClinicalValidationRules.validatePatient(
+                state0.patientName, state0.patientAge, state0.patientSex
+            ) + ClinicalValidationRules.validateChiefComplaint(state0.chiefComplaint)
+            if (integrityErrors.isNotEmpty()) {
+                _uiState.update { it.copy(saveError = integrityErrors.joinToString(" • ")) }
+                return@launch
+            }
+
+            // §2.6 Inimical Check Rule — block unless a typed justification overrides
+            val lastPrescribed = state0.savedPrescriptions.firstOrNull()?.prescribedRemedy
+            val inimical = ClinicalValidationRules.inimicalConflict(lastPrescribed, state0.rxRemedyName)
+            if (ClinicalValidationRules.inimicalJustificationRequired(inimical, state0.inimicalJustification)) {
+                _uiState.update {
+                    it.copy(saveError = "INIMICAL BLOCK — $inimical Type a clinical justification to override.")
+                }
+                return@launch
+            }
+
             val patient = PatientEntity(
                 mnr = "SIM-${System.currentTimeMillis() % 10000}",
                 name = _uiState.value.patientName,
@@ -592,13 +629,14 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
             )
             repository.savePrescription(prescription)
 
-            // Persist structured LSMC symptom records (docs/data/schema.md table 4)
+            // Persist structured LSMC symptom records (docs/data/schema.md table 4).
+            // §2.4: raw_utterance is capped at 1,000 characters at persistence time.
             repository.saveSymptomRecords(
                 state.symptoms.map { s ->
                     SymptomRecordEntity(
                         id = s.id,
                         sessionId = sessionId,
-                        rawUtterance = s.rawUtterance,
+                        rawUtterance = s.rawUtterance.take(ClinicalValidationRules.MAX_RAW_UTTERANCE_CHARS),
                         location = s.location,
                         sensation = s.sensation,
                         modalities = s.modalities,
@@ -631,7 +669,13 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
                 )
             }
 
-            _uiState.update { it.copy(lastSavedSessionId = sessionId) }
+            _uiState.update {
+                it.copy(
+                    lastSavedSessionId = sessionId,
+                    saveError = null,
+                    inimicalJustification = ""
+                )
+            }
         }
     }
 

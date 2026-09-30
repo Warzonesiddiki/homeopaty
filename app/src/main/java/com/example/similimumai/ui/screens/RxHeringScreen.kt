@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.similimumai.data.local.entity.SessionEntity
+import com.example.similimumai.data.validation.ClinicalValidationRules
 import com.example.similimumai.ui.theme.*
 import com.example.similimumai.R
 import com.example.similimumai.ui.viewmodel.ConsultationUiState
@@ -197,13 +198,47 @@ fun RxHeringScreen(
                         }
                     }
 
+                    // §2.6 Inimical Check Rule: strictly inimical transition gate
+                    if (uiState.inimicalConflict != null) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Surface(
+                            color = CrimsonContainer,
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("inimical_conflict_card")
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Text(
+                                    text = uiState.inimicalConflict,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = CrimsonOnContainer
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                OutlinedTextField(
+                                    value = uiState.inimicalJustification,
+                                    onValueChange = { viewModel.setInimicalJustification(it) },
+                                    label = { Text("Clinical justification to override (required)") },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textStyle = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(14.dp))
 
                     // Save Case to Room Database Button
                     Button(
                         onClick = {
                             viewModel.saveSessionToDatabase()
-                            Toast.makeText(context, "Consultation saved to SQLite database!", Toast.LENGTH_SHORT).show()
+                            val blockedByInimical = ClinicalValidationRules.inimicalJustificationRequired(
+                                uiState.inimicalConflict, uiState.inimicalJustification
+                            )
+                            if (!blockedByInimical) {
+                                Toast.makeText(context, "Consultation saved to SQLite database!", Toast.LENGTH_SHORT).show()
+                            }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary),
                         modifier = Modifier
@@ -221,6 +256,20 @@ fun RxHeringScreen(
                             text = stringResource(R.string.rx_save_record_button),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    // Clinical validation gate feedback (docs/data/validation-rules.md)
+                    uiState.saveError?.let { error ->
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = error,
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = CrimsonOnContainer,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("save_error")
                         )
                     }
                 }
@@ -519,6 +568,18 @@ private fun PractitionerProfileCard(
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = IndigoOnContainer)
             ) {
                 Text(stringResource(R.string.practitioner_save_button))
+            }
+            uiState.doctorProfileError?.let { error ->
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = error,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = CrimsonOnContainer,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("doctor_profile_error")
+                )
             }
         }
     }

@@ -83,6 +83,12 @@ data class ConsultationUiState(
 
     // Practitioner profile (schema.md table 1)
     val doctorProfile: DoctorEntity? = null,
+    val doctorProfileError: String? = null,
+
+    // Clinical validation gates (docs/data/validation-rules.md)
+    val saveError: String? = null,
+    val inimicalConflict: String? = null,
+    val inimicalJustification: String = "",
 
     // Room Database Saved Records
     val savedPatients: List<PatientEntity> = emptyList(),

@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.similimumai.data.engine.HomeopathyKnowledgeEngine
 import com.example.similimumai.data.model.*
+import com.example.similimumai.data.validation.ClinicalValidationRules
 import com.example.similimumai.ui.theme.*
 import com.example.similimumai.R
 import com.example.similimumai.ui.viewmodel.ConsultationUiState
@@ -82,6 +83,29 @@ fun RepertoryScreen(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(stringResource(R.string.repertory_add_rubric_button))
+                }
+            }
+        }
+
+        // §2.5 Eliminator guard: warn (not block) when too many rubrics empty the candidate set
+        ClinicalValidationRules.eliminatingRubricWarning(
+            uiState.activeRubrics.count { it.isEliminating }
+        )?.let { warning ->
+            item {
+                Surface(
+                    color = AmberContainer,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("eliminating_warning")
+                ) {
+                    Text(
+                        text = warning,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = AmberOnContainer,
+                        modifier = Modifier.padding(10.dp)
+                    )
                 }
             }
         }
