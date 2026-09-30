@@ -13,7 +13,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -25,6 +25,7 @@ import com.example.similimumai.ui.components.TopClinicalStatusBar
 import com.example.similimumai.ui.screens.*
 import com.example.similimumai.ui.theme.EmeraldPrimary
 import com.example.similimumai.ui.theme.SimilimumAITheme
+import com.example.similimumai.ui.viewmodel.ConsultationUiState
 import com.example.similimumai.ui.viewmodel.ConsultationViewModel
 import com.example.similimumai.ui.viewmodel.NavigationTab
 
@@ -33,14 +34,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        // 15-minute periodic case-sync sweep (docs/ai/offline-strategy.md §3)
-        SyncScheduler.schedulePeriodicSync(this)
+        // 15-minute periodic case-sync sweep (docs/ai/offline-strategy.md §3).
+        // Scheduling must never crash cold start (e.g., test harnesses without
+        // a provisioned WorkManager initializer).
+        runCatching { SyncScheduler.schedulePeriodicSync(this) }
 
         setContent {
             SimilimumAITheme {
                 val viewModel: ConsultationViewModel = viewModel()
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-                val context = LocalContext.current
 
                 // Permission launcher for ambient audio capture
                 val recordAudioPermissionLauncher = rememberLauncherForActivityResult(
@@ -58,109 +60,168 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    topBar = {
-                        Column(modifier = Modifier.statusBarsPadding()) {
-                            TopClinicalStatusBar(
-                                patientName = uiState.patientName,
-                                patientAge = uiState.patientAge,
-                                patientSex = uiState.patientSex,
-                                thermalState = uiState.patientThermal,
-                                isMicActive = uiState.isMicListening,
-                                isSimulating = uiState.isSimulationRunning,
-                                isGeminiAvailable = uiState.isGeminiAvailable,
-                                isOnline = uiState.isOnline
-                            )
+                // docs/design/responsive.md §1: Material 3 Window Size Classes.
+                // Compact (phones < 600dp)  -> single-column + bottom NavigationBar.
+                // Expanded (tablets >= 600dp) -> left NavigationRail + full-screen
+                // workspace (ergonomic left-edge reach for desk-stand tablets).
+                val windowSizeClass = computeWindowSizeClass()
 
-                            // Red-flag triage banner if emergency detected
-                            uiState.activeRedFlag?.let { redFlag ->
-                                RedFlagBanner(
-                                    alert = redFlag,
-                                    onDismiss = { viewModel.dismissRedFlag() }
-                                )
-                            }
+                if (windowSizeClass.isExpanded) {
+                    Row(modifier = Modifier.fillMaxSize()) {
+                        ExpandedNavigationRail(
+                            currentTab = uiState.currentTab,
+                            onTabSelected = { viewModel.selectNavigationTab(it) }
+                        )
 
-                            // Sticky Top-3 candidate remedy tracker
-                            MiniRemedyLeaderboard(
-                                scores = uiState.remedyScores,
-                                onRemedyClick = { remedy ->
-                                    viewModel.selectRemedyDetail(remedy)
-                                    viewModel.selectNavigationTab(NavigationTab.MATERIA_MEDICA)
-                                }
-                            )
-                        }
-                    },
-                    bottomBar = {
-                        NavigationBar(
-                            modifier = Modifier.testTag("bottom_nav_bar"),
-                            tonalElevation = 4.dp
-                        ) {
-                            NavigationTab.values().forEach { tab ->
-                                val (icon, tag) = when (tab) {
-                                    NavigationTab.HUD -> Icons.Default.PlayArrow to "nav_hud"
-                                    NavigationTab.LSMC_RADAR -> Icons.Default.Search to "nav_lsmc"
-                                    NavigationTab.REPERTORY -> Icons.Default.Star to "nav_repertory"
-                                    NavigationTab.MATERIA_MEDICA -> Icons.Default.Favorite to "nav_materia"
-                                    NavigationTab.RX_HERING -> Icons.Default.Check to "nav_rx"
-                                    NavigationTab.VISION_LAB -> Icons.Default.Insights to "nav_vision_lab"
-                                }
-
-                                NavigationBarItem(
-                                    selected = uiState.currentTab == tab,
-                                    onClick = { viewModel.selectNavigationTab(tab) },
-                                    icon = {
-                                        Icon(
-                                            imageVector = icon,
-                                            contentDescription = tab.label
-                                        )
-                                    },
-                                    label = { Text(tab.label) },
-                                    colors = NavigationBarItemDefaults.colors(
-                                        selectedIconColor = EmeraldPrimary,
-                                        selectedTextColor = EmeraldPrimary,
-                                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                                    ),
-                                    modifier = Modifier.testTag(tag)
-                                )
+                        Column(modifier = Modifier.weight(1f).fillMaxSize()) {
+                            TopClinicalHeader(uiState = uiState, viewModel = viewModel)
+                            Box(modifier = Modifier.weight(1f).fillMaxSize()) {
+                                CurrentWorkspace(uiState = uiState, viewModel = viewModel)
                             }
                         }
                     }
-                ) { innerPadding ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding)
-                    ) {
-                        when (uiState.currentTab) {
-                            NavigationTab.HUD -> HudScreen(
-                                uiState = uiState,
-                                viewModel = viewModel
-                            )
-                            NavigationTab.LSMC_RADAR -> LsmcRadarScreen(
-                                uiState = uiState,
-                                viewModel = viewModel
-                            )
-                            NavigationTab.REPERTORY -> RepertoryScreen(
-                                uiState = uiState,
-                                viewModel = viewModel
-                            )
-                            NavigationTab.MATERIA_MEDICA -> MateriaMedicaScreen(
-                                uiState = uiState,
-                                viewModel = viewModel
-                            )
-                            NavigationTab.RX_HERING -> RxHeringScreen(
-                                uiState = uiState,
-                                viewModel = viewModel
-                            )
-                            NavigationTab.VISION_LAB -> VisionLabScreen(
-                                uiState = uiState,
-                                viewModel = viewModel
-                            )
+                } else {
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                        topBar = {
+                            TopClinicalHeader(uiState = uiState, viewModel = viewModel)
+                        },
+                        bottomBar = {
+                            NavigationBar(
+                                modifier = Modifier.testTag("bottom_nav_bar"),
+                                tonalElevation = 4.dp
+                            ) {
+                                NavigationTab.values().forEach { tab ->
+                                    val (icon, tag) = navIconAndTag(tab)
+
+                                    NavigationBarItem(
+                                        selected = uiState.currentTab == tab,
+                                        onClick = { viewModel.selectNavigationTab(tab) },
+                                        icon = {
+                                            Icon(
+                                                imageVector = icon,
+                                                contentDescription = tab.label
+                                            )
+                                        },
+                                        label = { Text(tab.label) },
+                                        colors = NavigationBarItemDefaults.colors(
+                                            selectedIconColor = EmeraldPrimary,
+                                            selectedTextColor = EmeraldPrimary,
+                                            indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                                        ),
+                                        modifier = Modifier.testTag(tag)
+                                    )
+                                }
+                            }
+                        }
+                    ) { innerPadding ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                        ) {
+                            CurrentWorkspace(uiState = uiState, viewModel = viewModel)
                         }
                     }
                 }
             }
         }
+    }
+}
+
+/**
+ * Shared top-of-screen clinical header: patient status bar, red-flag triage
+ * banner and the sticky Top-3 candidate remedy tracker (both form factors).
+ */
+@Composable
+private fun TopClinicalHeader(
+    uiState: ConsultationUiState,
+    viewModel: ConsultationViewModel
+) {
+    Column(modifier = Modifier.statusBarsPadding()) {
+        TopClinicalStatusBar(
+            patientName = uiState.patientName,
+            patientAge = uiState.patientAge,
+            patientSex = uiState.patientSex,
+            thermalState = uiState.patientThermal,
+            isMicActive = uiState.isMicListening,
+            isSimulating = uiState.isSimulationRunning,
+            isGeminiAvailable = uiState.isGeminiAvailable,
+            isOnline = uiState.isOnline
+        )
+
+        // Red-flag triage banner if emergency detected
+        uiState.activeRedFlag?.let { redFlag ->
+            RedFlagBanner(
+                alert = redFlag,
+                onDismiss = { viewModel.dismissRedFlag() }
+            )
+        }
+
+        // Sticky Top-3 candidate remedy tracker
+        MiniRemedyLeaderboard(
+            scores = uiState.remedyScores,
+            onRemedyClick = { remedy ->
+                viewModel.selectRemedyDetail(remedy)
+                viewModel.selectNavigationTab(NavigationTab.MATERIA_MEDICA)
+            }
+        )
+    }
+}
+
+/** Left-edge navigation rail for the Expanded (tablet) form factor. */
+@Composable
+private fun ExpandedNavigationRail(
+    currentTab: NavigationTab,
+    onTabSelected: (NavigationTab) -> Unit
+) {
+    NavigationRail(modifier = Modifier.testTag("navigation_rail")) {
+        Spacer(modifier = Modifier.statusBarsPadding())
+        NavigationTab.values().forEach { tab ->
+            val (icon, tag) = navIconAndTag(tab)
+
+            NavigationRailItem(
+                selected = currentTab == tab,
+                onClick = { onTabSelected(tab) },
+                icon = {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = tab.label
+                    )
+                },
+                label = { Text(tab.label) },
+                colors = NavigationRailItemDefaults.colors(
+                    selectedIconColor = EmeraldPrimary,
+                    selectedTextColor = EmeraldPrimary,
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                ),
+                modifier = Modifier.testTag(tag)
+            )
+        }
+    }
+}
+
+private fun navIconAndTag(tab: NavigationTab): Pair<ImageVector, String> = when (tab) {
+    NavigationTab.HUD -> Icons.Default.PlayArrow to "nav_hud"
+    NavigationTab.LSMC_RADAR -> Icons.Default.Search to "nav_lsmc"
+    NavigationTab.REPERTORY -> Icons.Default.Star to "nav_repertory"
+    NavigationTab.MATERIA_MEDICA -> Icons.Default.Favorite to "nav_materia"
+    NavigationTab.RX_HERING -> Icons.Default.Check to "nav_rx"
+    NavigationTab.VISION_LAB -> Icons.Default.Insights to "nav_vision_lab"
+}
+
+/** The six clinical workspaces, switched by navigation tab. */
+@Composable
+private fun CurrentWorkspace(
+    uiState: ConsultationUiState,
+    viewModel: ConsultationViewModel
+) {
+    when (uiState.currentTab) {
+        NavigationTab.HUD -> HudScreen(uiState = uiState, viewModel = viewModel)
+        NavigationTab.LSMC_RADAR -> LsmcRadarScreen(uiState = uiState, viewModel = viewModel)
+        NavigationTab.REPERTORY -> RepertoryScreen(uiState = uiState, viewModel = viewModel)
+        NavigationTab.MATERIA_MEDICA -> MateriaMedicaScreen(uiState = uiState, viewModel = viewModel)
+        NavigationTab.RX_HERING -> RxHeringScreen(uiState = uiState, viewModel = viewModel)
+        NavigationTab.VISION_LAB -> VisionLabScreen(uiState = uiState, viewModel = viewModel)
     }
 }

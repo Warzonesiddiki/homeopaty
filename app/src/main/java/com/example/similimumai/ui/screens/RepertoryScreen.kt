@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -219,6 +220,19 @@ fun RepertoryScreen(
                     viewModel.selectNavigationTab(NavigationTab.MATERIA_MEDICA)
                 }
             )
+        }
+
+        // responsive.md §2.2: candidate matrix — rubric rows × top-5 remedy
+        // columns. Compact: horizontally scrollable grid; Expanded: full
+        // widescreen matrix without horizontal scroll truncation.
+        if (uiState.activeRubrics.isNotEmpty() && uiState.remedyScores.isNotEmpty()) {
+            item {
+                CandidateMatrixCard(
+                    rubrics = uiState.activeRubrics,
+                    scores = uiState.remedyScores.take(5),
+                    isExpanded = computeWindowSizeClass().isExpanded
+                )
+            }
         }
 
         item {
@@ -509,6 +523,171 @@ private fun RemedyScoreRow(score: RemedyScore, onClick: () -> Unit) {
                     text = "${score.rubricsCovered} / ${score.totalRubrics} rubrics",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Candidate remedy matrix (docs/design/responsive.md §2.2): active rubrics
+ * listed vertically, the top candidate remedy abbreviations fixed in the
+ * header row, grade cells (1/2/3) and total scores per remedy.
+ */
+@Composable
+private fun CandidateMatrixCard(
+    rubrics: List<Rubric>,
+    scores: List<RemedyScore>,
+    isExpanded: Boolean
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(12.dp),
+        shadowElevation = 1.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("candidate_matrix")
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(
+                text = "CANDIDATE MATRIX",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            if (isExpanded) {
+                CandidateMatrixGrid(rubrics = rubrics, scores = scores, isExpanded = true)
+            } else {
+                Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                    CandidateMatrixGrid(rubrics = rubrics, scores = scores, isExpanded = false)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CandidateMatrixGrid(
+    rubrics: List<Rubric>,
+    scores: List<RemedyScore>,
+    isExpanded: Boolean
+) {
+    val columnModifier = if (isExpanded) {
+        Modifier.weight(1f)
+    } else {
+        Modifier.width(64.dp)
+    }
+    val labelWidth = if (isExpanded) 160.dp else 120.dp
+
+    // Fixed remedy-abbreviation header (responsive.md §2.2)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = "RUBRIC",
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.width(labelWidth)
+        )
+        scores.forEach { score ->
+            Column(
+                modifier = columnModifier,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = score.remedy.abbreviation,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = EmeraldPrimary
+                )
+                Text(
+                    text = score.remedy.fullName,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+
+    Spacer(modifier = Modifier.height(6.dp))
+
+    // Rubric rows with per-remedy grade cells
+    rubrics.take(8).forEach { rubric ->
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "${rubric.chapter}: ${rubric.name}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.width(labelWidth),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            scores.forEach { score ->
+                val grade = rubric.remedyGrades[score.remedy.abbreviation]
+                val (cellColor, cellText) = when (grade) {
+                    3 -> EmeraldContainer to "3"
+                    2 -> IndigoContainer to "2"
+                    1 -> AmberContainer to "1"
+                    else -> MaterialTheme.colorScheme.surfaceVariant to "—"
+                }
+                Surface(
+                    color = cellColor,
+                    shape = RoundedCornerShape(6.dp),
+                    modifier = columnModifier
+                ) {
+                    Text(
+                        text = cellText,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+    }
+
+    // Total score row
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "TOTAL",
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = EmeraldPrimary,
+            modifier = Modifier.width(labelWidth)
+        )
+        scores.forEach { score ->
+            Surface(
+                color = EmeraldContainer,
+                shape = RoundedCornerShape(6.dp),
+                modifier = columnModifier
+            ) {
+                Text(
+                    text = "${score.totalScore}",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = EmeraldOnContainer,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
                 )
             }
         }

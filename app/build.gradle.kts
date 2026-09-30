@@ -85,6 +85,7 @@ dependencies {
 
     // Tier 1: Local JVM clinical invariant tests (docs/engineering/testing-qa-strategy.md)
     testImplementation(libs.junit)
+    testImplementation(libs.androidx.compose.ui.test.junit4)
 
     // Tier 2: Robolectric component & lifecycle tests (ViewModel StateFlow, Room DAO, Speech Manager states)
     testImplementation(libs.robolectric)
