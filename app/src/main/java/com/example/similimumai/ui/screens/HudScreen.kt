@@ -299,23 +299,57 @@ fun HudScreen(
         }
 
         if (uiState.transcript.isEmpty()) {
+            // ux-states.md §2.1 + ASSUMPTION-UX-01: zero-data state offers
+            // actionable 1-tap sample utterances for first-time exploration.
             item {
                 Surface(
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Box(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(24.dp),
-                        contentAlignment = Alignment.Center
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Text(
                             text = stringResource(R.string.hud_no_dialogue_hint),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                        Text(
+                            text = "TRY A SAMPLE PATIENT UTTERANCE:",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            listOf(
+                                "Sar mein dhoop se dard hota hai, doctor.",
+                                "Gussa dabane se pet kharab ho jata hai.",
+                                "Raat ko 2 baje se neend nahi aati, paani ki pyaas rehti hai."
+                            ).forEach { sample ->
+                                Surface(
+                                    color = IndigoContainer,
+                                    shape = RoundedCornerShape(16.dp),
+                                    modifier = Modifier
+                                        .clickable { viewModel.processUtterance(sample, SpeakerType.PATIENT) }
+                                        .testTag("sample_utterance_pill")
+                                ) {
+                                    Text(
+                                        text = sample,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = IndigoOnContainer,
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }

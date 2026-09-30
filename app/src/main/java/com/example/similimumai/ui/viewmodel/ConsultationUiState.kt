@@ -85,6 +85,9 @@ data class ConsultationUiState(
     val doctorProfile: DoctorEntity? = null,
     val doctorProfileError: String? = null,
 
+    // Connectivity (docs/ai/offline-strategy.md §2)
+    val isOnline: Boolean = true,
+
     // Clinical validation gates (docs/data/validation-rules.md)
     val saveError: String? = null,
     val inimicalConflict: String? = null,

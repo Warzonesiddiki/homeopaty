@@ -127,6 +127,8 @@ fun RxHeringScreen(
                                 viewModel.updatePrescription(remedyName, it, uiState.rxScale, posology)
                             },
                             label = { Text(stringResource(R.string.rx_potency_label)) },
+                            // ux-states.md §2.5: red outline on unselected potency picker
+                            isError = potency.isBlank(),
                             modifier = Modifier
                                 .weight(1f)
                                 .testTag("rx_potency_input"),

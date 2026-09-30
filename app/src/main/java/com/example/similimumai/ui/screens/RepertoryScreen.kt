@@ -162,6 +162,54 @@ fun RepertoryScreen(
             }
         }
 
+        // ux-states.md §2.3: elimination-conflict + empty leaderboard states
+        item {
+            val hasRubrics = uiState.activeRubrics.isNotEmpty()
+            val allZero = uiState.remedyScores.isNotEmpty() &&
+                uiState.remedyScores.all { it.totalScore == 0 }
+            when {
+                hasRubrics && allZero -> {
+                    val elimName = uiState.activeRubrics.firstOrNull { it.isEliminating }?.name
+                        ?: uiState.thermalEliminationFilter?.let {
+                            "Thermal Elimination Filter (${it.name})"
+                        }
+                    Surface(
+                        color = AmberContainer,
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("elimination_conflict_card")
+                    ) {
+                        Text(
+                            text = "Zero remedies cover all active rubrics." +
+                                (elimName?.let { " Consider unchecking the strict eliminator on $it." }
+                                    ?: " Review or remove the strictest rubrics."),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = AmberOnContainer,
+                            modifier = Modifier.padding(12.dp)
+                        )
+                    }
+                }
+                !hasRubrics -> {
+                    Surface(
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("leaderboard_empty_state")
+                    ) {
+                        Text(
+                            text = "No rubrics ingested yet — stream a case on the HUD or tap '+ Add Rubric' above to build the candidate matrix.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(14.dp)
+                        )
+                    }
+                }
+            }
+        }
+
         // Remedy Scores Table
         items(uiState.remedyScores.take(10)) { score ->
             RemedyScoreRow(

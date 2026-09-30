@@ -65,7 +65,8 @@ class MainActivity : ComponentActivity() {
                                 thermalState = uiState.patientThermal,
                                 isMicActive = uiState.isMicListening,
                                 isSimulating = uiState.isSimulationRunning,
-                                isGeminiAvailable = uiState.isGeminiAvailable
+                                isGeminiAvailable = uiState.isGeminiAvailable,
+                                isOnline = uiState.isOnline
                             )
 
                             // Red-flag triage banner if emergency detected

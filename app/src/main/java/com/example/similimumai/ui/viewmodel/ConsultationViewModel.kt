@@ -4,6 +4,9 @@ import android.app.Application
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.similimumai.data.engine.CaseSheetPdfRenderer
@@ -47,6 +50,11 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
 
     private var simulationJob: Job? = null
 
+    // Connectivity monitor (docs/ai/offline-strategy.md §2.1)
+    private val connectivityManager =
+        application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
+
     init {
         val database = ConsultationDatabase.getDatabase(application)
         repository = ConsultationRepository(
@@ -61,6 +69,29 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
 
         // Check Gemini status
         _uiState.update { it.copy(isGeminiAvailable = geminiService.isAvailable) }
+
+        // Monitor live connectivity: the status bar pill flips instantly to
+        // amber "Offline Mode (Local Knowledge Base Active)" when the network drops.
+        try {
+            connectivityManager.registerDefaultNetworkCallback(
+                object : ConnectivityManager.NetworkCallback() {
+                    override fun onAvailable(network: Network) =
+                        _uiState.update { it.copy(isOnline = true) }
+
+                    override fun onLost(network: Network) =
+                        _uiState.update { it.copy(isOnline = false) }
+
+                    override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
+                        val online = caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                            !caps.hasTransport(NetworkCapabilities.NET_CAPABILITY_NOT_VALIDATED)
+                        _uiState.update { it.copy(isOnline = online) }
+                    }
+                }
+            ).also { networkCallback = it }
+        } catch (e: Exception) {
+            // Test/sandbox environments without a live ConnectivityManager —
+            // stay optimistically online; the local KB works either way.
+        }
 
         // Observe saved patients from Room
         viewModelScope.launch {
@@ -690,5 +721,11 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
                 chiefComplaint = complaint
             )
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        networkCallback?.let { runCatching { connectivityManager.unregisterNetworkCallback(it) } }
+        audioSpeechManager.stopListening()
     }
 }

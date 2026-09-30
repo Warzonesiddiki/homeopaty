@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.similimumai.data.model.ThermalState
 import com.example.similimumai.ui.theme.*
+import com.example.similimumai.ui.viewmodel.ConnectionMode
+import com.example.similimumai.ui.viewmodel.ConnectionStatus
 
 @Composable
 fun TopClinicalStatusBar(
@@ -28,8 +30,10 @@ fun TopClinicalStatusBar(
     isMicActive: Boolean,
     isSimulating: Boolean,
     isGeminiAvailable: Boolean,
+    isOnline: Boolean = true,
     modifier: Modifier = Modifier
 ) {
+    val connectionMode = ConnectionStatus.mode(isOnline, isGeminiAvailable)
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -168,10 +172,16 @@ fun TopClinicalStatusBar(
                         }
                     }
 
-                    // Gemini Cloud Badge
+                    // Connectivity + AI Badge (docs/ai/offline-strategy.md §2.1):
+                    // green "AI Connected" flips to amber "Offline Mode (Local
+                    // Knowledge Base Active)" the instant the network drops.
                     Surface(
-                        color = if (isGeminiAvailable) VioletContainer else SlateDarkSurfaceVariant.copy(alpha = 0.2f),
-                        shape = RoundedCornerShape(12.dp)
+                        color = when (connectionMode) {
+                            ConnectionMode.OFFLINE -> AmberContainer
+                            else -> EmeraldContainer
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.testTag("connection_status_pill")
                     ) {
                         Row(
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -179,16 +189,26 @@ fun TopClinicalStatusBar(
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = "Gemini",
-                                tint = if (isGeminiAvailable) VioletPqrs else TextSecondaryLight,
+                                imageVector = when (connectionMode) {
+                                    ConnectionMode.OFFLINE -> Icons.Default.CloudOff
+                                    ConnectionMode.ONLINE_CLOUD -> Icons.Default.Cloud
+                                    ConnectionMode.ONLINE_LOCAL -> Icons.Default.Cloud
+                                },
+                                contentDescription = "Connection status",
+                                tint = when (connectionMode) {
+                                    ConnectionMode.OFFLINE -> AmberOnContainer
+                                    else -> EmeraldOnContainer
+                                },
                                 modifier = Modifier.size(14.dp)
                             )
                             Text(
-                                text = if (isGeminiAvailable) "Gemini 2.5" else "Offline Core",
+                                text = ConnectionStatus.pillLabel(isOnline, isGeminiAvailable),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = if (isGeminiAvailable) VioletPqrs else TextSecondaryLight
+                                color = when (connectionMode) {
+                                    ConnectionMode.OFFLINE -> AmberOnContainer
+                                    else -> EmeraldOnContainer
+                                }
                             )
                         }
                     }

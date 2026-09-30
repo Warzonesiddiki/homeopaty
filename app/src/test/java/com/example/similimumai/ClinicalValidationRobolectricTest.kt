@@ -102,6 +102,15 @@ class ClinicalValidationRobolectricTest {
     }
 
     @Test
+    fun `viewmodel - connectivity state defaults online and clears safely`() {
+        val vm = createViewModel()
+        assertEquals(true, vm.uiState.value.isOnline)
+
+        // unregistering the network callback + stopping audio must not throw
+        vm.onCleared()
+    }
+
+    @Test
     fun `viewmodel - invalid doctor profile never reaches room`() = runBlocking {
         val vm = createViewModel()
         vm.updateDoctorProfile(
