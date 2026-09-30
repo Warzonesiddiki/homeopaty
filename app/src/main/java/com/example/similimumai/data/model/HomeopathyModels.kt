@@ -122,6 +122,22 @@ enum class CaseMode(val label: String) {
     FOLLOW_UP("FOLLOW-UP (HERING)")
 }
 
+// Vision Lab: diagnostic visual inspection (docs/engineering/project-structure.md)
+enum class VisionPanel(val label: String) {
+    TONGUE("Tongue Inspection"),
+    SKIN("Skin & Perspiration"),
+    GENERAL("General Physical Signs")
+}
+
+data class VisualFinding(
+    val id: String,
+    val panel: VisionPanel,
+    val label: String,
+    val remedyCodes: List<String>,
+    val rubricId: String = "", // canonical rubric activated when the finding is recorded
+    val chapter: String = "MOUTH"
+)
+
 // LM 50-Millesimal Posology Protocol (Organon §270-§272, Hahnemann's Q Method)
 data class LmProtocol(
     val potency: String, // e.g. "LM 1"

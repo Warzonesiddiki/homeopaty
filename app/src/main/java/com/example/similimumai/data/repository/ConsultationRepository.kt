@@ -1,10 +1,14 @@
 package com.example.similimumai.data.repository
 
+import com.example.similimumai.data.local.dao.CaseRubricDao
+import com.example.similimumai.data.local.dao.DoctorDao
 import com.example.similimumai.data.local.dao.FollowUpDao
 import com.example.similimumai.data.local.dao.PatientDao
 import com.example.similimumai.data.local.dao.PrescriptionDao
 import com.example.similimumai.data.local.dao.SessionDao
 import com.example.similimumai.data.local.dao.SymptomRecordDao
+import com.example.similimumai.data.local.entity.CaseRubricEntity
+import com.example.similimumai.data.local.entity.DoctorEntity
 import com.example.similimumai.data.local.entity.FollowUpEntity
 import com.example.similimumai.data.local.entity.PatientEntity
 import com.example.similimumai.data.local.entity.PrescriptionEntity
@@ -17,11 +21,18 @@ class ConsultationRepository(
     private val sessionDao: SessionDao,
     private val prescriptionDao: PrescriptionDao,
     private val symptomRecordDao: SymptomRecordDao,
-    private val followUpDao: FollowUpDao
+    private val followUpDao: FollowUpDao,
+    private val doctorDao: DoctorDao,
+    private val caseRubricDao: CaseRubricDao
 ) {
     val allPatients: Flow<List<PatientEntity>> = patientDao.getAllPatients()
     val allSessions: Flow<List<SessionEntity>> = sessionDao.getAllSessions()
     val allPrescriptions: Flow<List<PrescriptionEntity>> = prescriptionDao.getAllPrescriptions()
+    val allSymptomRecords: Flow<List<SymptomRecordEntity>> = symptomRecordDao.getAll()
+    val allFollowUps: Flow<List<FollowUpEntity>> = followUpDao.getAll()
+    val allCaseRubrics: Flow<List<CaseRubricEntity>> = caseRubricDao.getAll()
+
+    fun getDoctor(id: String = "default"): Flow<DoctorEntity?> = doctorDao.getDoctor(id)
 
     fun getSessionsForPatient(patientId: Long): Flow<List<SessionEntity>> {
         return sessionDao.getSessionsForPatient(patientId)
@@ -37,6 +48,10 @@ class ConsultationRepository(
 
     fun getFollowUpsForSession(sessionId: Long): Flow<List<FollowUpEntity>> {
         return followUpDao.getBySession(sessionId)
+    }
+
+    fun getCaseRubricsForSession(sessionId: Long): Flow<List<CaseRubricEntity>> {
+        return caseRubricDao.getBySession(sessionId)
     }
 
     suspend fun getPatientById(patientId: Long): PatientEntity? {
@@ -73,5 +88,13 @@ class ConsultationRepository(
 
     suspend fun saveFollowUp(followUp: FollowUpEntity): Long {
         return followUpDao.insert(followUp)
+    }
+
+    suspend fun saveDoctor(doctor: DoctorEntity) {
+        doctorDao.upsertDoctor(doctor)
+    }
+
+    suspend fun saveCaseRubrics(rubrics: List<CaseRubricEntity>) {
+        if (rubrics.isNotEmpty()) caseRubricDao.insertAll(rubrics)
     }
 }

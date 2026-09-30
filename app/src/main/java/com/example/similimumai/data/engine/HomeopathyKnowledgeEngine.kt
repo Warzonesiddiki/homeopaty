@@ -460,6 +460,39 @@ object HomeopathyKnowledgeEngine {
         }
     }
 
+    // ─── Vision Lab: visual inspection findings & remedy associations ──────
+    val visualFindings: List<VisualFinding> = listOf(
+        // Tongue
+        VisualFinding("v_tongue_red_tip", VisionPanel.TONGUE, "Red, dry tongue with red triangular tip", listOf("Rhus-t", "Phos", "Bell"), "r_mouth_tongue_red_tip", "MOUTH"),
+        VisualFinding("v_tongue_imprints", VisionPanel.TONGUE, "Swollen flabby tongue with teeth imprints", listOf("Merc", "Puls", "Calc"), "r_mouth_tongue_imprints", "MOUTH"),
+        VisualFinding("v_tongue_pale", VisionPanel.TONGUE, "Pale swollen tongue, trembles at the tip", listOf("Calc", "Puls", "Chin"), "r_mouth_tongue_pale_swollen", "MOUTH"),
+        VisualFinding("v_tongue_geographic", VisionPanel.TONGUE, "Mapped / geographic tongue with smooth patches", listOf("Nat-m", "Puls", "Ign"), "r_mouth_tongue_geographic", "MOUTH"),
+        VisualFinding("v_tongue_yellow", VisionPanel.TONGUE, "Thick yellow or brownish coating", listOf("Lyc", "Calc", "Puls"), "r_mouth_tongue_yellow_coating", "MOUTH"),
+        VisualFinding("v_tongue_white", VisionPanel.TONGUE, "Clean white coating, thin and moist", listOf("Puls", "Sil", "Chin"), "r_mouth_tongue_white_coating", "MOUTH"),
+        VisualFinding("v_tongue_scalded", VisionPanel.TONGUE, "Dry red tongue, scalded-looking", listOf("Bell", "Phos", "Ars"), "r_mouth_tongue_dry_red", "MOUTH"),
+        VisualFinding("v_tongue_cracked", VisionPanel.TONGUE, "Cracked, fissured tongue in the middle", listOf("Nat-m", "Phos", "Sulph"), "r_mouth_tongue_cracked", "MOUTH"),
+        VisualFinding("v_tongue_trembling", VisionPanel.TONGUE, "Tremulous tongue, shakes when protruded", listOf("Merc", "Bry", "Bell"), "r_mouth_tongue_trembling", "MOUTH"),
+        // Skin & perspiration
+        VisualFinding("v_skin_itchy", VisionPanel.SKIN, "Itchy eruptions, worse warm bed", listOf("Sulph", "Puls"), "r_skin_eruption_itchy", "SKIN"),
+        VisualFinding("v_skin_puffy", VisionPanel.SKIN, "Stinging, puffy, edematous swelling", listOf("Apis", "Kali-c"), "r_skin_stinging_puffy", "SKIN"),
+        VisualFinding("v_skin_warts", VisionPanel.SKIN, "Warts and warty excrescences", listOf("Thuj", "Sep"), "r_skin_warts", "SKIN"),
+        VisualFinding("v_skin_bruised", VisionPanel.SKIN, "Skin sore as if beaten or bruised", listOf("Arn", "Bell"), "r_skin_bruised_sore", "SKIN"),
+        VisualFinding("v_skin_offensive_sweat", VisionPanel.SKIN, "Offensive sour perspiration (feet/body)", listOf("Sil", "Merc"), "r_skin_sweat_offensive", "SKIN"),
+        VisualFinding("v_skin_flexural", VisionPanel.SKIN, "Eczema in the flexures of the joints", listOf("Puls", "Sil", "Merc"), "r_skin_flexural_eczema", "SKIN"),
+        VisualFinding("v_skin_burning_beds", VisionPanel.SKIN, "Burning skin, worse warm bed, better uncovered", listOf("Sulph", "Puls", "Phos"), "r_skin_burning_beds", "SKIN"),
+        // General physical signs
+        VisualFinding("v_gen_one_cheek", VisionPanel.GENERAL, "One cheek hot and red, other pale and cool", listOf("Cham", "Puls"), "r_face_one_cheek", "FACE"),
+        VisualFinding("v_gen_saddle_nose", VisionPanel.GENERAL, "Brownish saddle discoloration across the nose", listOf("Sep"), "r_face_saddle_nose", "FACE"),
+        VisualFinding("v_gen_cold_feet", VisionPanel.GENERAL, "Feet cold and damp, like wet stockings", listOf("Calc", "Nux-v"), "r_ext_cold_feet", "GENERALITIES"),
+        VisualFinding("v_gen_burning_soles", VisionPanel.GENERAL, "Burning soles of feet, worse at night", listOf("Sulph", "Phos"), "r_ext_burning_soles", "GENERALITIES"),
+        VisualFinding("v_gen_head_sweat", VisionPanel.GENERAL, "Profuse sweat on head and neck during sleep", listOf("Calc", "Merc"), "r_skin_sweat_head", "SKIN"),
+        VisualFinding("v_gen_puffy_eyelids", VisionPanel.GENERAL, "Puffy upper eyelids and swollen lips", listOf("Kali-c", "Apis"), "r_eyes_lids_puffy", "EYES")
+    )
+
+    /** Remedies classically associated with a recorded visual finding. */
+    fun remediesForFinding(finding: VisualFinding): List<Remedy> =
+        polychrests.filter { finding.remedyCodes.contains(it.abbreviation) }
+
     // ─── Plain-Text Case Sheet & Prescription Generator (MVP MVE criterion 4) ───
     fun generateCaseSheet(
         patientName: String,

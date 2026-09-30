@@ -17,11 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.similimumai.data.engine.HomeopathyKnowledgeEngine
 import com.example.similimumai.data.model.Remedy
 import com.example.similimumai.ui.theme.*
+import com.example.similimumai.R
 import com.example.similimumai.ui.viewmodel.ConsultationUiState
 import com.example.similimumai.ui.viewmodel.ConsultationViewModel
 
@@ -63,7 +65,7 @@ fun MateriaMedicaScreen(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    placeholder = { Text("Search 30+ Polychrests...") },
+                    placeholder = { Text(stringResource(R.string.materia_search_placeholder)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -87,7 +89,7 @@ fun MateriaMedicaScreen(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Compare")
+                    Text(stringResource(R.string.materia_compare_short))
                 }
             }
         }
@@ -153,7 +155,7 @@ fun MateriaMedicaScreen(
             onDismissRequest = { showCompareDialog = false },
             title = {
                 Text(
-                    text = "Comparative Materia Medica",
+                    text = stringResource(R.string.materia_medicale_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -161,7 +163,7 @@ fun MateriaMedicaScreen(
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(
-                        text = "Select two competing polychrests to compare keynotes and verify inimical safety:",
+                        text = stringResource(R.string.materia_medicale_subtitle),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -197,12 +199,12 @@ fun MateriaMedicaScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = EmeraldPrimary)
                 ) {
-                    Text("Compare Side-by-Side")
+                    Text(stringResource(R.string.materia_compare_button))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showCompareDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.common_cancel))
                 }
             }
         )
@@ -284,7 +286,7 @@ private fun RemedyDetailCard(remedy: Remedy) {
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "CLASSICAL KEYNOTES & CHARACTERISTICS (§153 PQRS)",
+                text = stringResource(R.string.materia_keynotes_title),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -299,7 +301,7 @@ private fun RemedyDetailCard(remedy: Remedy) {
                         verticalAlignment = Alignment.Top
                     ) {
                         Text(
-                            text = "•",
+                            text = stringResource(R.string.bullet_marker),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
                             color = EmeraldPrimary
@@ -336,7 +338,7 @@ private fun RemedyRelationshipCard(remedy: Remedy) {
                     modifier = Modifier.size(18.dp)
                 )
                 Text(
-                    text = "CLINICAL DRUG RELATIONSHIPS & INIMICAL SAFETY",
+                    text = stringResource(R.string.materia_relations_title),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -352,7 +354,7 @@ private fun RemedyRelationshipCard(remedy: Remedy) {
                 ) {
                     Column(modifier = Modifier.padding(10.dp)) {
                         Text(
-                            text = "STRICTLY INIMICAL (NEVER PRESCRIBE IN SEQUENCE):",
+                            text = stringResource(R.string.materia_inimical_label),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.ExtraBold,
                             color = CrimsonRedFlag
@@ -375,7 +377,7 @@ private fun RemedyRelationshipCard(remedy: Remedy) {
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Complementary Follow-ups:",
+                        text = stringResource(R.string.materia_complementary_label),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = StatusSuccess
@@ -388,7 +390,7 @@ private fun RemedyRelationshipCard(remedy: Remedy) {
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Antidotes:",
+                        text = stringResource(R.string.materia_antidotes_label),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant

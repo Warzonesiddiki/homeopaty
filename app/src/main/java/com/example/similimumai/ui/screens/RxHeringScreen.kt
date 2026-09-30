@@ -14,11 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.similimumai.data.local.entity.SessionEntity
 import com.example.similimumai.ui.theme.*
+import com.example.similimumai.R
 import com.example.similimumai.ui.viewmodel.ConsultationUiState
 import com.example.similimumai.ui.viewmodel.ConsultationViewModel
 import java.text.SimpleDateFormat
@@ -77,7 +79,7 @@ fun RxHeringScreen(
                                 modifier = Modifier.size(20.dp)
                             )
                             Text(
-                                text = "CLINICAL PRESCRIPTION PAD",
+                                text = stringResource(R.string.rx_prescription_pad_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = EmeraldPrimary
@@ -89,7 +91,7 @@ fun RxHeringScreen(
                             shape = RoundedCornerShape(6.dp)
                         ) {
                             Text(
-                                text = "Organon §245–§285",
+                                text = stringResource(R.string.rx_organon_ref),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = EmeraldOnContainer,
@@ -110,7 +112,7 @@ fun RxHeringScreen(
                                 remedyName = it
                                 viewModel.updatePrescription(it, potency, uiState.rxScale, posology)
                             },
-                            label = { Text("Prescribed Remedy") },
+                            label = { Text(stringResource(R.string.rx_remedy_label)) },
                             modifier = Modifier
                                 .weight(1.5f)
                                 .testTag("rx_remedy_input"),
@@ -123,7 +125,7 @@ fun RxHeringScreen(
                                 potency = it
                                 viewModel.updatePrescription(remedyName, it, uiState.rxScale, posology)
                             },
-                            label = { Text("Potency") },
+                            label = { Text(stringResource(R.string.rx_potency_label)) },
                             modifier = Modifier
                                 .weight(1f)
                                 .testTag("rx_potency_input"),
@@ -158,7 +160,7 @@ fun RxHeringScreen(
                             posology = it
                             viewModel.updatePrescription(remedyName, potency, uiState.rxScale, it)
                         },
-                        label = { Text("Posology & Administration Instructions") },
+                        label = { Text(stringResource(R.string.rx_posology_label)) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .testTag("rx_posology_input"),
@@ -168,7 +170,7 @@ fun RxHeringScreen(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
-                        text = "DIETARY RESTRICTIONS (Hahnemannian Antidote Prohibitions):",
+                        text = stringResource(R.string.rx_dietary_restrictions_label),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -216,7 +218,7 @@ fun RxHeringScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "SAVE CONSULTATION RECORD (ROOM DB)",
+                            text = stringResource(R.string.rx_save_record_button),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -253,7 +255,7 @@ fun RxHeringScreen(
                             modifier = Modifier.size(20.dp)
                         )
                         Text(
-                            text = "HERING'S LAW OF CURE EVALUATOR",
+                            text = stringResource(R.string.hering_evaluator_title),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = IndigoGenerals
@@ -261,7 +263,7 @@ fun RxHeringScreen(
                     }
 
                     Text(
-                        text = "Evaluate follow-up healing progression direction (§245):",
+                        text = stringResource(R.string.hering_evaluator_subtitle),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -357,6 +359,14 @@ fun RxHeringScreen(
             )
         }
 
+        // Local practitioner profile (docs/data/schema.md table 1)
+        item {
+            PractitionerProfileCard(
+                uiState = uiState,
+                viewModel = viewModel
+            )
+        }
+
         // Room Database Historical Records
         item {
             Text(
@@ -381,7 +391,7 @@ fun RxHeringScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "No saved consultation sessions yet. Tap 'SAVE CONSULTATION RECORD' above.",
+                            text = stringResource(R.string.rx_no_saved_sessions_hint),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -390,7 +400,7 @@ fun RxHeringScreen(
             }
         } else {
             items(uiState.savedSessions) { session ->
-                SavedSessionCard(session = session)
+                SavedSessionCard(session = session, uiState = uiState)
             }
         }
 
@@ -432,11 +442,107 @@ private fun HeringCheckboxRow(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SavedSessionCard(session: SessionEntity) {
+private fun PractitionerProfileCard(
+    uiState: ConsultationUiState,
+    viewModel: ConsultationViewModel
+) {
+    val doctor = uiState.doctorProfile
+    var name by remember(doctor?.fullName) { mutableStateOf(doctor?.fullName ?: "") }
+    var registration by remember(doctor?.registrationNumber) { mutableStateOf(doctor?.registrationNumber ?: "") }
+    var qualification by remember(doctor?.qualification) { mutableStateOf(doctor?.qualification ?: "") }
+
+    Card(
+        colors = CardDefaults.cardColors(containerColor = IndigoContainer),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("practitioner_profile_card")
+    ) {
+        Column(modifier = Modifier.padding(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    tint = IndigoOnContainer,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.practitioner_profile_title),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = IndigoOnContainer
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text(stringResource(R.string.practitioner_full_name_label)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = registration,
+                    onValueChange = { registration = it },
+                    label = { Text(stringResource(R.string.practitioner_registration_label)) },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f)
+                )
+                OutlinedTextField(
+                    value = qualification,
+                    onValueChange = { qualification = it },
+                    label = { Text(stringResource(R.string.practitioner_qualification_label)) },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = {
+                    viewModel.updateDoctorProfile(
+                        fullName = name.trim(),
+                        registrationNumber = registration.trim(),
+                        qualification = qualification.trim(),
+                        clinicName = doctor?.clinicName ?: "",
+                        clinicAddress = doctor?.clinicAddress ?: "",
+                        phoneNumber = doctor?.phoneNumber ?: "",
+                        email = doctor?.email ?: ""
+                    )
+                },
+                enabled = name.isNotBlank(),
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = IndigoOnContainer)
+            ) {
+                Text(stringResource(R.string.practitioner_save_button))
+            }
+        }
+    }
+}
+
+@Composable
+private fun SavedSessionCard(session: SessionEntity, uiState: ConsultationUiState) {
     val dateString = remember(session.sessionDate) {
         val sdf = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
         sdf.format(Date(session.sessionDate))
+    }
+    val symptomCount = remember(session.id, uiState.savedSymptomRecords) {
+        uiState.savedSymptomRecords.count { it.sessionId == session.id }
+    }
+    val rubricCount = remember(session.id, uiState.savedCaseRubrics) {
+        uiState.savedCaseRubrics.count { it.sessionId == session.id }
+    }
+    val followUpCount = remember(session.id, uiState.savedFollowUps) {
+        uiState.savedFollowUps.count { it.sessionId == session.id }
+    }
+    val lastKentAction = remember(session.id, uiState.savedFollowUps) {
+        uiState.savedFollowUps
+            .filter { it.sessionId == session.id && it.recommendedAction.isNotBlank() }
+            .lastOrNull()?.recommendedAction
     }
 
     Card(
@@ -478,6 +584,36 @@ private fun SavedSessionCard(session: SessionEntity) {
                 style = MaterialTheme.typography.labelSmall,
                 color = if (session.heringStatus.contains("True")) StatusSuccess else MaterialTheme.colorScheme.onSurfaceVariant
             )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                HistoryStatChip("$symptomCount symptoms", EmeraldContainer, EmeraldOnContainer)
+                HistoryStatChip("$rubricCount rubrics", VioletContainer, VioletOnContainer)
+                HistoryStatChip("$followUpCount follow-ups", IndigoContainer, IndigoOnContainer)
+                lastKentAction?.let {
+                    HistoryStatChip("Kent: $it", AmberContainer, AmberOnContainer)
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun HistoryStatChip(text: String, container: Color, onContainer: Color) {
+    Surface(
+        color = container,
+        shape = RoundedCornerShape(6.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.SemiBold,
+            color = onContainer,
+            modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
+        )
     }
 }

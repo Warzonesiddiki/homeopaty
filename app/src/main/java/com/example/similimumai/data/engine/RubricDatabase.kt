@@ -358,6 +358,21 @@ object RubricDatabase {
         Rubric("r_gen_after_sleep", "GENERALITIES", "Aggravation after sleep", mapOf("Lach" to 3, "Puls" to 2, "Nux-v" to 1), isPqrs = true, weight = 3),
         Rubric("r_gen_emaciation", "GENERALITIES", "Emaciation, wasting, hollow cheeks", mapOf("Sil" to 2, "Phos" to 1, "Merc" to 1), weight = 1),
 
+        // ─── MOUTH / TONGUE (Vision Lab canonical rubrics) ─────────────────
+        Rubric("r_mouth_tongue_red_tip", "MOUTH", "Tongue red, dry, with red triangular tip", mapOf("Rhus-t" to 3, "Phos" to 2, "Bell" to 2), isPqrs = true, weight = 2),
+        Rubric("r_mouth_tongue_imprints", "MOUTH", "Tongue swollen, flabby, showing teeth imprints", mapOf("Merc" to 3, "Puls" to 2, "Calc" to 1), isPqrs = true, weight = 2),
+        Rubric("r_mouth_tongue_pale_swollen", "MOUTH", "Tongue pale, swollen, with tremor at the tip", mapOf("Calc" to 3, "Puls" to 2, "Chin" to 1), weight = 2),
+        Rubric("r_mouth_tongue_geographic", "MOUTH", "Tongue mapped / geographic, smooth with patches", mapOf("Nat-m" to 3, "Puls" to 1, "Ign" to 1), isPqrs = true, weight = 2),
+        Rubric("r_mouth_tongue_yellow_coating", "MOUTH", "Tongue with thick yellow or brownish coating", mapOf("Lyc" to 3, "Calc" to 2, "Puls" to 1), weight = 2),
+        Rubric("r_mouth_tongue_white_coating", "MOUTH", "Tongue with clean white coating, thin and moist", mapOf("Puls" to 3, "Sil" to 2, "Chin" to 1), weight = 2),
+        Rubric("r_mouth_tongue_dry_red", "MOUTH", "Tongue dry, red, scalded-looking", mapOf("Bell" to 3, "Phos" to 2, "Ars" to 2), weight = 2),
+        Rubric("r_mouth_tongue_cracked", "MOUTH", "Tongue cracked, fissured in the middle", mapOf("Nat-m" to 3, "Phos" to 2, "Sulph" to 1), isPqrs = true, weight = 2),
+        Rubric("r_mouth_tongue_trembling", "MOUTH", "Tongue tremulous, shakes when protruded", mapOf("Merc" to 3, "Bry" to 2, "Bell" to 1), isPqrs = true, weight = 2),
+
+        // ─── SKIN — VISION LAB EXTENSIONS ───────────────────────────────────
+        Rubric("r_skin_flexural_eczema", "SKIN", "Eczema and eruptions in flexures of joints", mapOf("Puls" to 3, "Sil" to 2, "Merc" to 1), weight = 2),
+        Rubric("r_skin_burning_beds", "SKIN", "Skin burning, worse in warm bed, better uncovered", mapOf("Sulph" to 3, "Puls" to 2, "Phos" to 1), weight = 2),
+
         // ─── TIME ───────────────────────────────────────────────────────────
         Rubric("r_time_morning_5_10", "TIME", "Aggravation morning, 5 AM to 10 AM", mapOf("Nat-m" to 3, "Puls" to 2), weight = 2),
         Rubric("r_time_11am", "TIME", "Aggravation at 11 AM", mapOf("Sulph" to 3, "Puls" to 1), isPqrs = true, weight = 3),

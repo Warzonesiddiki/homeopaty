@@ -1,3 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Similimum AI</string>
+
+    <!-- Workspace 1: Co-Pilot HUD -->
+    <string name="hud_silent_observation_title">DOCTOR\'S SILENT PHYSICAL OBSERVATIONS (§83)</string>
+    <string name="hud_ask_next_title">ASK-NEXT HIGH-YIELD QUESTIONS</string>
+    <string name="hud_totality_label">Hahnemannian Totality §153</string>
+    <string name="hud_ai_synthesis_title">CONSTITUTIONAL AI SYNTHESIS</string>
+    <string name="hud_synthesize_button">Synthesize Case</string>
+    <string name="hud_dialogue_stream_title">CONSULTATION DIALOGUE STREAM</string>
+    <string name="hud_no_dialogue_hint">No dialogue yet. Click \'SIMULATE CASE\' or start the ambient microphone to begin.</string>
+    <string name="hud_select_simulation">Select Clinical Simulation Case</string>
+    <string name="hud_audio_ingestion_title">Clinical Audio Ingestion</string>
+    <string name="hud_audio_ingestion_subtitle">Continuous speech stream or multi-turn simulation</string>
+    <string name="hud_pause_stream_button">PAUSE STREAM</string>
+    <string name="hud_simulate_case_button">SIMULATE CASE</string>
+
+    <!-- Workspace 2: LSMC Radar -->
+    <string name="lsmc_decomposition_title">BOENNINGHAUSEN LSMC SYMPTOM DECOMPOSITION</string>
+    <string name="lsmc_no_symptoms_hint">No symptoms extracted yet. Speak into the microphone or start simulation on the HUD tab.</string>
+    <string name="lsmc_totality_gauge_title">Boenninghausen Totality Gauge</string>
+    <string name="lsmc_totality_gauge_subtitle">Organon §83–§104 Complete Case Quality</string>
+    <string name="lsmc_pillar_assessment_title">12-Pillar Constitutional Assessment</string>
+    <string name="lsmc_thermal_state_title">THERMAL STATE (Physical General)</string>
+    <string name="lsmc_miasm_title">DOMINANT MIASMATIC DIATHESIS (Hahnemann\'s Chronic Diseases)</string>
+    <string name="pqrs_153_label">§153 PQRS</string>
+    <string name="pqrs_153_label_alt">PQRS §153</string>
+
+    <!-- Workspace 3: Repertory -->
+    <string name="repertory_active_rubrics_title">ACTIVE REPERTORY RUBRICS</string>
+    <string name="repertory_no_rubrics_hint">No rubrics active. Click \'+ Add Rubric\' or stream a case on HUD.</string>
+    <string name="repertory_candidates_title">RANKED CANDIDATE SIMILIMUMS</string>
+    <string name="repertory_add_rubric_title">Add Canonical Repertory Rubric</string>
+    <string name="repertory_school_title">REPERTORY CALCULATION SCHOOL</string>
+    <string name="repertory_thermal_filter_title">THERMAL ELIMINATION FILTER (Disqualify Non-Matching)</string>
+
+    <!-- Workspace 4: Materia Medica -->
+    <string name="materia_medicale_title">Comparative Materia Medica</string>
+    <string name="materia_medicale_subtitle">Select two competing polychrests to compare keynotes and verify inimical safety:</string>
+    <string name="materia_keynotes_title">CLASSICAL KEYNOTES &amp; CHARACTERISTICS (§153 PQRS)</string>
+    <string name="bullet_marker">•</string>
+    <string name="materia_relations_title">CLINICAL DRUG RELATIONSHIPS &amp; INIMICAL SAFETY</string>
+    <string name="materia_inimical_label">STRICTLY INIMICAL (NEVER PRESCRIBE IN SEQUENCE):</string>
+    <string name="materia_complementary_label">Complementary Follow-ups:</string>
+    <string name="materia_antidotes_label">Antidotes:</string>
+
+    <!-- Workspace 5: Rx &amp; Hering -->
+    <string name="rx_prescription_pad_title">CLINICAL PRESCRIPTION PAD</string>
+    <string name="rx_organon_ref">Organon §245–§285</string>
+    <string name="rx_dietary_restrictions_label">DIETARY RESTRICTIONS (Hahnemannian Antidote Prohibitions):</string>
+    <string name="rx_save_record_button">SAVE CONSULTATION RECORD (ROOM DB)</string>
+    <string name="hering_evaluator_title">HERING\'S LAW OF CURE EVALUATOR</string>
+    <string name="hering_evaluator_subtitle">Evaluate follow-up healing progression direction (§245):</string>
+    <string name="rx_no_saved_sessions_hint">No saved consultation sessions yet. Tap \'SAVE CONSULTATION RECORD\' above.</string>
+    <string name="practitioner_profile_title">PRACTITIONER PROFILE (LOCAL)</string>
+    <string name="practitioner_full_name_label">Full Name</string>
+    <string name="practitioner_registration_label">Registration No.</string>
+    <string name="practitioner_qualification_label">Qualification</string>
+    <string name="practitioner_save_button">SAVE PRACTITIONER PROFILE</string>
+
+    <!-- LM calculator + Kent observations + case sheet (Workspace 5 cards) -->
+    <string name="lm_calculator_title">LM 50-MILLESIMAL DILUTION CALCULATOR</string>
+    <string name="lm_calculator_subtitle">Hahnemann\'s Q method — Organon §270-§272. Select the potency level:</string>
+    <string name="lm_hypersensitive_question">Hypersensitive patient (reduced succussions)?</string>
+    <string name="kent_observations_title">KENT\'S 12 PROGNOSTIC OBSERVATIONS</string>
+    <string name="kent_observations_subtitle">Follow-up reaction classification with clinical next-step guidance:</string>
+    <string name="kent_old_suppressed_label">Old suppressed symptoms re-appeared (Hering\'s reverse order)</string>
+    <string name="case_sheet_export_title">CASE SHEET EXPORT &amp; CASE MODE</string>
+    <string name="case_sheet_export_subtitle">Select the consultation mode, then generate the formatted plain-text case sheet with prescription:</string>
+    <string name="case_sheet_copy_button">GENERATE &amp; COPY CASE SHEET</string>
+    <string name="case_sheet_pdf_button">EXPORT &amp; SHARE PDF CASE RECORD</string>
+
+    <!-- Shared UI copy -->
+    <string name="common_close">Close</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_done">Done</string>
+    <string name="hud_input_placeholder">Enter patient phrase or clinical note...</string>
+    <string name="materia_search_placeholder">Search 30+ Polychrests...</string>
+    <string name="materia_compare_short">Compare</string>
+    <string name="materia_compare_button">Compare Side-by-Side</string>
+    <string name="repertory_add_rubric_button">Add Rubric</string>
+    <string name="rx_remedy_label">Prescribed Remedy</string>
+    <string name="rx_potency_label">Potency</string>
+    <string name="rx_posology_label">Posology &amp; Administration Instructions</string>
+
+    <!-- Workspace 6: Vision Lab -->
+    <string name="vision_lab_title">DIAGNOSTIC VISION LAB</string>
+    <string name="vision_lab_subtitle">Silent physical inspection — tap observed findings; the repertory matrix updates instantly.</string>
 </resources>

@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.example.similimumai.data.engine.HomeopathyKnowledgeEngine
 import com.example.similimumai.data.model.*
 import com.example.similimumai.ui.theme.*
+import com.example.similimumai.R
 import com.example.similimumai.ui.viewmodel.ConsultationUiState
 import com.example.similimumai.ui.viewmodel.ConsultationViewModel
 import com.example.similimumai.ui.viewmodel.NavigationTab
@@ -63,7 +65,7 @@ fun RepertoryScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "ACTIVE REPERTORY RUBRICS",
+                    text = stringResource(R.string.repertory_active_rubrics_title),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -79,7 +81,7 @@ fun RepertoryScreen(
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Add Rubric")
+                    Text(stringResource(R.string.repertory_add_rubric_button))
                 }
             }
         }
@@ -99,7 +101,7 @@ fun RepertoryScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "No rubrics active. Click '+ Add Rubric' or stream a case on HUD.",
+                            text = stringResource(R.string.repertory_no_rubrics_hint),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -123,7 +125,7 @@ fun RepertoryScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "RANKED CANDIDATE SIMILIMUMS",
+                    text = stringResource(R.string.repertory_candidates_title),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     color = EmeraldPrimary
@@ -158,7 +160,7 @@ fun RepertoryScreen(
             onDismissRequest = { showAddRubricDialog = false },
             title = {
                 Text(
-                    text = "Add Canonical Repertory Rubric",
+                    text = stringResource(R.string.repertory_add_rubric_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -219,7 +221,7 @@ fun RepertoryScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showAddRubricDialog = false }) {
-                    Text("Done")
+                    Text(stringResource(R.string.common_done))
                 }
             }
         )
@@ -241,7 +243,7 @@ private fun RepertoryControlsCard(
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
             Text(
-                text = "REPERTORY CALCULATION SCHOOL",
+                text = stringResource(R.string.repertory_school_title),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -275,7 +277,7 @@ private fun RepertoryControlsCard(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = "THERMAL ELIMINATION FILTER (Disqualify Non-Matching)",
+                text = stringResource(R.string.repertory_thermal_filter_title),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -342,7 +344,7 @@ private fun RubricItemCard(rubric: Rubric, onDelete: () -> Unit) {
                             shape = RoundedCornerShape(4.dp)
                         ) {
                             Text(
-                                text = "PQRS §153",
+                                text = stringResource(R.string.pqrs_153_label_alt),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = VioletPqrs,

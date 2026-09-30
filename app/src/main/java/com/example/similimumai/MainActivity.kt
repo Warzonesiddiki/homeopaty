@@ -98,6 +98,7 @@ class MainActivity : ComponentActivity() {
                                     NavigationTab.REPERTORY -> Icons.Default.Star to "nav_repertory"
                                     NavigationTab.MATERIA_MEDICA -> Icons.Default.Favorite to "nav_materia"
                                     NavigationTab.RX_HERING -> Icons.Default.Check to "nav_rx"
+                                    NavigationTab.VISION_LAB -> Icons.Default.Insights to "nav_vision_lab"
                                 }
 
                                 NavigationBarItem(
@@ -144,6 +145,10 @@ class MainActivity : ComponentActivity() {
                                 viewModel = viewModel
                             )
                             NavigationTab.RX_HERING -> RxHeringScreen(
+                                uiState = uiState,
+                                viewModel = viewModel
+                            )
+                            NavigationTab.VISION_LAB -> VisionLabScreen(
                                 uiState = uiState,
                                 viewModel = viewModel
                             )

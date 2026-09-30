@@ -17,11 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.similimumai.data.model.*
 import com.example.similimumai.ui.theme.*
+import com.example.similimumai.R
 import com.example.similimumai.ui.viewmodel.ConsultationUiState
 import com.example.similimumai.ui.viewmodel.ConsultationViewModel
 
@@ -57,7 +59,7 @@ fun LmDilutionCard(
                     modifier = Modifier.size(20.dp)
                 )
                 Text(
-                    text = "LM 50-MILLESIMAL DILUTION CALCULATOR",
+                    text = stringResource(R.string.lm_calculator_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = AmberModalities
@@ -65,7 +67,7 @@ fun LmDilutionCard(
             }
 
             Text(
-                text = "Hahnemann's Q method — Organon §270-§272. Select the potency level:",
+                text = stringResource(R.string.lm_calculator_subtitle),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -98,7 +100,7 @@ fun LmDilutionCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Hypersensitive patient (reduced succussions)?",
+                    text = stringResource(R.string.lm_hypersensitive_question),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.weight(1f)
                 )
@@ -181,7 +183,7 @@ fun KentObservationsCard(
                     modifier = Modifier.size(20.dp)
                 )
                 Text(
-                    text = "KENT'S 12 PROGNOSTIC OBSERVATIONS",
+                    text = stringResource(R.string.kent_observations_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = VioletPqrs
@@ -189,7 +191,7 @@ fun KentObservationsCard(
             }
 
             Text(
-                text = "Follow-up reaction classification with clinical next-step guidance:",
+                text = stringResource(R.string.kent_observations_subtitle),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -255,7 +257,7 @@ fun KentObservationsCard(
                     modifier = Modifier.testTag("kent_old_symptoms_checkbox")
                 )
                 Text(
-                    text = "Old suppressed symptoms re-appeared (Hering's reverse order)",
+                    text = stringResource(R.string.kent_old_suppressed_label),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -361,7 +363,7 @@ fun CaseSheetCard(
                     modifier = Modifier.size(20.dp)
                 )
                 Text(
-                    text = "CASE SHEET EXPORT & CASE MODE",
+                    text = stringResource(R.string.case_sheet_export_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = EmeraldPrimary
@@ -369,7 +371,7 @@ fun CaseSheetCard(
             }
 
             Text(
-                text = "Select the consultation mode, then generate the formatted plain-text case sheet with prescription:",
+                text = stringResource(R.string.case_sheet_export_subtitle),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -412,7 +414,7 @@ fun CaseSheetCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "GENERATE & COPY CASE SHEET",
+                    text = stringResource(R.string.case_sheet_copy_button),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -456,7 +458,7 @@ fun CaseSheetCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "EXPORT & SHARE PDF CASE RECORD",
+                    text = stringResource(R.string.case_sheet_pdf_button),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold
                 )

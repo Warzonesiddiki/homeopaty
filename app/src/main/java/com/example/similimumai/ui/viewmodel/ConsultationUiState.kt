@@ -1,8 +1,12 @@
 package com.example.similimumai.ui.viewmodel
 
+import com.example.similimumai.data.local.entity.CaseRubricEntity
+import com.example.similimumai.data.local.entity.DoctorEntity
+import com.example.similimumai.data.local.entity.FollowUpEntity
 import com.example.similimumai.data.local.entity.PatientEntity
 import com.example.similimumai.data.local.entity.PrescriptionEntity
 import com.example.similimumai.data.local.entity.SessionEntity
+import com.example.similimumai.data.local.entity.SymptomRecordEntity
 import com.example.similimumai.data.model.*
 import com.example.similimumai.data.speech.SimulatedCase
 
@@ -11,7 +15,8 @@ enum class NavigationTab(val label: String) {
     LSMC_RADAR("LSMC Radar"),
     REPERTORY("Repertory"),
     MATERIA_MEDICA("Materia Medica"),
-    RX_HERING("Rx & Hering")
+    RX_HERING("Rx & Hering"),
+    VISION_LAB("Vision Lab")
 }
 
 data class ConsultationUiState(
@@ -76,8 +81,14 @@ data class ConsultationUiState(
     val isAiAnalyzing: Boolean = false,
     val aiConstitutionalSynthesis: String = "",
 
+    // Practitioner profile (schema.md table 1)
+    val doctorProfile: DoctorEntity? = null,
+
     // Room Database Saved Records
     val savedPatients: List<PatientEntity> = emptyList(),
     val savedSessions: List<SessionEntity> = emptyList(),
-    val savedPrescriptions: List<PrescriptionEntity> = emptyList()
+    val savedPrescriptions: List<PrescriptionEntity> = emptyList(),
+    val savedSymptomRecords: List<SymptomRecordEntity> = emptyList(),
+    val savedFollowUps: List<FollowUpEntity> = emptyList(),
+    val savedCaseRubrics: List<CaseRubricEntity> = emptyList()
 )

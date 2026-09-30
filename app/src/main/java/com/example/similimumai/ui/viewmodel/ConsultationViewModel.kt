@@ -10,6 +10,8 @@ import com.example.similimumai.data.engine.CaseSheetPdfRenderer
 import com.example.similimumai.data.engine.GeminiClinicalService
 import com.example.similimumai.data.engine.HomeopathyKnowledgeEngine
 import com.example.similimumai.data.local.ConsultationDatabase
+import com.example.similimumai.data.local.entity.CaseRubricEntity
+import com.example.similimumai.data.local.entity.DoctorEntity
 import com.example.similimumai.data.local.entity.FollowUpEntity
 import com.example.similimumai.data.local.entity.PatientEntity
 import com.example.similimumai.data.local.entity.PrescriptionEntity
@@ -51,7 +53,9 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
             database.sessionDao(),
             database.prescriptionDao(),
             database.symptomRecordDao(),
-            database.followUpDao()
+            database.followUpDao(),
+            database.doctorDao(),
+            database.caseRubricDao()
         )
 
         // Check Gemini status
@@ -75,6 +79,30 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
         viewModelScope.launch {
             repository.allPrescriptions.collect { list ->
                 _uiState.update { it.copy(savedPrescriptions = list) }
+            }
+        }
+
+        // Observe structured history for the saved-records review (schema.md tables 4/6/10)
+        viewModelScope.launch {
+            repository.allSymptomRecords.collect { list ->
+                _uiState.update { it.copy(savedSymptomRecords = list) }
+            }
+        }
+        viewModelScope.launch {
+            repository.allFollowUps.collect { list ->
+                _uiState.update { it.copy(savedFollowUps = list) }
+            }
+        }
+        viewModelScope.launch {
+            repository.allCaseRubrics.collect { list ->
+                _uiState.update { it.copy(savedCaseRubrics = list) }
+            }
+        }
+
+        // Load the local practitioner profile (schema.md table 1)
+        viewModelScope.launch {
+            repository.getDoctor().collect { doctor ->
+                _uiState.update { it.copy(doctorProfile = doctor) }
             }
         }
 
@@ -349,6 +377,51 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
         _uiState.update { it.copy(caseMode = mode) }
     }
 
+    // Practitioner profile (schema.md table 1)
+    fun updateDoctorProfile(
+        fullName: String,
+        registrationNumber: String,
+        qualification: String,
+        clinicName: String,
+        clinicAddress: String,
+        phoneNumber: String,
+        email: String
+    ) {
+        viewModelScope.launch {
+            repository.saveDoctor(
+                DoctorEntity(
+                    fullName = fullName,
+                    registrationNumber = registrationNumber,
+                    qualification = qualification,
+                    clinicName = clinicName,
+                    clinicAddress = clinicAddress,
+                    phoneNumber = phoneNumber,
+                    email = email,
+                    updatedAt = System.currentTimeMillis()
+                )
+            )
+        }
+    }
+
+    // Vision Lab: record a visual inspection finding into the consultation
+    fun recordVisualFinding(finding: VisualFinding) {
+        val rubric = if (finding.rubricId.isNotBlank()) {
+            HomeopathyKnowledgeEngine.rubrics.find { it.id == finding.rubricId }
+        } else null
+        val symptom = Symptom(
+            id = UUID.randomUUID().toString(),
+            location = finding.panel.label,
+            sensation = finding.label,
+            modalities = "Doctor's silent physical observation",
+            isPqrs = rubric?.isPqrs ?: true,
+            rawUtterance = "Vision Lab finding: ${finding.label}",
+            canonicalRubric = rubric?.name ?: "",
+            completenessScore = 60
+        )
+        addSymptom(symptom)
+        if (rubric != null) addRubric(rubric)
+    }
+
     // LM 50-Millesimal dilution protocol (Organon §270-§272)
     fun updateLmParameters(potency: String, isHypersensitive: Boolean) {
         val protocol = HomeopathyKnowledgeEngine.calculateLmProtocol(potency, isHypersensitive)
@@ -392,7 +465,7 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
 
     private fun buildCaseSheetText(): String {
         val state = _uiState.value
-        return HomeopathyKnowledgeEngine.generateCaseSheet(
+        val generated = HomeopathyKnowledgeEngine.generateCaseSheet(
             patientName = state.patientName,
             patientAge = state.patientAge,
             patientSex = state.patientSex,
@@ -411,6 +484,23 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
             hering = state.heringEvaluation,
             lmProtocol = state.lmProtocol
         )
+
+        // Append the local practitioner signature (schema.md table 1) when known
+        val doctor = state.doctorProfile
+        if (doctor == null || doctor.fullName.isBlank()) return generated
+        val practitionerLine = buildString {
+            append("Prescribed By: Dr. ").append(doctor.fullName)
+            if (doctor.registrationNumber.isNotBlank()) append(" (Reg. ").append(doctor.registrationNumber).append(")")
+            if (doctor.clinicName.isNotBlank()) append(" — ").append(doctor.clinicName)
+            if (doctor.phoneNumber.isNotBlank()) append(" — ").append(doctor.phoneNumber)
+        }
+        val lines = generated.lines()
+        val titleIndex = lines.indexOfFirst { it.trimStart().startsWith("SIMILIMUM AI") }
+        return if (titleIndex >= 0) {
+            (lines.take(titleIndex + 1) + listOf(practitionerLine) + lines.drop(titleIndex + 1)).joinToString("\n")
+        } else {
+            generated + "\n\n$practitionerLine"
+        }
     }
 
     fun evaluateHering(insideToOut: Boolean, aboveDown: Boolean, vitalToLess: Boolean, reverseTime: Boolean) {
@@ -461,18 +551,35 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
             )
             val patientId = repository.savePatient(patient)
 
+            val state = _uiState.value
             val session = SessionEntity(
                 patientId = patientId,
                 sessionDate = System.currentTimeMillis(),
-                consultationType = _uiState.value.caseMode.name,
-                summaryNotes = _uiState.value.symptoms.joinToString("; ") { "${it.location} - ${it.sensation} (${it.modalities})" },
-                totalityScore = (_uiState.value.symptoms.map { it.completenessScore }.average().takeIf { !it.isNaN() } ?: 60.0).toInt(),
-                prescribedRemedy = _uiState.value.rxRemedyName,
-                potency = _uiState.value.rxPotency,
-                posology = _uiState.value.rxPosology,
-                heringStatus = _uiState.value.heringEvaluation?.prognosisVerdict ?: "Not Evaluated"
+                consultationType = state.caseMode.name,
+                caseStatus = "ACTIVE",
+                summaryNotes = state.symptoms.joinToString("; ") { "${it.location} - ${it.sensation} (${it.modalities})" },
+                totalityScore = (state.symptoms.map { it.completenessScore }.average().takeIf { !it.isNaN() } ?: 60.0).toInt(),
+                prescribedRemedy = state.rxRemedyName,
+                potency = state.rxPotency,
+                posology = state.rxPosology,
+                heringStatus = state.heringEvaluation?.prognosisVerdict ?: "Not Evaluated",
+                transcriptText = state.transcript.joinToString("\n") { "${it.speaker}: ${it.text}" },
+                clinicalNotes = state.aiConstitutionalSynthesis,
+                repertorySchool = state.selectedSchool.name
             )
             val sessionId = repository.saveSession(session)
+
+            // Persist the active canonical rubric set (docs/data/schema.md table 6)
+            repository.saveCaseRubrics(
+                state.activeRubrics.map { r ->
+                    CaseRubricEntity(
+                        sessionId = sessionId,
+                        rubricId = r.id,
+                        weight = r.weight,
+                        isEliminating = r.isEliminating
+                    )
+                }
+            )
 
             // Persist the prescription record (docs/03 §5: PrescriptionEntity)
             val prescription = PrescriptionEntity(
@@ -486,7 +593,6 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
             repository.savePrescription(prescription)
 
             // Persist structured LSMC symptom records (docs/data/schema.md table 4)
-            val state = _uiState.value
             repository.saveSymptomRecords(
                 state.symptoms.map { s ->
                     SymptomRecordEntity(

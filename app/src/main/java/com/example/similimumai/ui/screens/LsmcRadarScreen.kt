@@ -14,12 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.similimumai.data.model.Miasm
 import com.example.similimumai.data.model.Symptom
 import com.example.similimumai.data.model.ThermalState
 import com.example.similimumai.ui.theme.*
+import com.example.similimumai.R
 import com.example.similimumai.ui.viewmodel.ConsultationUiState
 import com.example.similimumai.ui.viewmodel.ConsultationViewModel
 
@@ -87,7 +89,7 @@ fun LsmcRadarScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "BOENNINGHAUSEN LSMC SYMPTOM DECOMPOSITION",
+                    text = stringResource(R.string.lsmc_decomposition_title),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -114,7 +116,7 @@ fun LsmcRadarScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "No symptoms extracted yet. Speak into the microphone or start simulation on the HUD tab.",
+                            text = stringResource(R.string.lsmc_no_symptoms_hint),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -152,13 +154,13 @@ private fun TotalityCompletenessCard(
             ) {
                 Column {
                     Text(
-                        text = "Boenninghausen Totality Gauge",
+                        text = stringResource(R.string.lsmc_totality_gauge_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = EmeraldOnContainer
                     )
                     Text(
-                        text = "Organon §83–§104 Complete Case Quality",
+                        text = stringResource(R.string.lsmc_totality_gauge_subtitle),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -236,7 +238,7 @@ private fun ConstitutionalAssessmentCard(
                     modifier = Modifier.size(20.dp)
                 )
                 Text(
-                    text = "12-Pillar Constitutional Assessment",
+                    text = stringResource(R.string.lsmc_pillar_assessment_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -246,7 +248,7 @@ private fun ConstitutionalAssessmentCard(
 
             // Thermal Affinity Selector
             Text(
-                text = "THERMAL STATE (Physical General)",
+                text = stringResource(R.string.lsmc_thermal_state_title),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -271,7 +273,7 @@ private fun ConstitutionalAssessmentCard(
 
             // Miasmatic Dominance Selector
             Text(
-                text = "DOMINANT MIASMATIC DIATHESIS (Hahnemann's Chronic Diseases)",
+                text = stringResource(R.string.lsmc_miasm_title),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -324,7 +326,7 @@ private fun LsmcSymptomCard(symptom: Symptom) {
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = "§153 PQRS",
+                            text = stringResource(R.string.pqrs_153_label),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = VioletPqrs,

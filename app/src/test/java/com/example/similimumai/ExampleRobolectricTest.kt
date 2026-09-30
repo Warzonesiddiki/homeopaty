@@ -4,6 +4,8 @@ import android.os.Looper
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.example.similimumai.data.local.ConsultationDatabase
+import com.example.similimumai.data.local.entity.CaseRubricEntity
+import com.example.similimumai.data.local.entity.DoctorEntity
 import com.example.similimumai.data.local.entity.FollowUpEntity
 import com.example.similimumai.data.local.entity.PatientEntity
 import com.example.similimumai.data.local.entity.PrescriptionEntity
@@ -293,6 +295,118 @@ class ExampleRobolectricTest {
             assertEquals(1, followUps.size)
             assertTrue(followUps.first().insideOutward)
         }
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // Schema v5: doctors + case_rubrics (docs/data/schema.md tables 1 & 6)
+    // ────────────────────────────────────────────────────────────────────────
+
+    @Test
+    fun `room - practitioner profile upserts and reads back`() = runBlocking {
+        val db = inMemoryDatabase()
+        val dao = db.doctorDao()
+
+        assertTrue("no doctor row until saved", dao.getDoctor("default").first() == null)
+
+        dao.upsertDoctor(
+            DoctorEntity(
+                fullName = "Dr. Test Practitioner",
+                registrationNumber = "HO-1234",
+                qualification = "BHMS",
+                clinicName = "Test Clinic"
+            )
+        )
+        val saved = dao.getDoctor("default").first()
+        assertNotNull(saved)
+        assertEquals("Dr. Test Practitioner", saved?.fullName)
+        assertEquals("HO-1234", saved?.registrationNumber)
+
+        // REPLACE upsert refreshes the single row without duplicating
+        dao.upsertDoctor(DoctorEntity(fullName = "Dr. Updated"))
+        val refreshed = dao.getDoctor("default").first()
+        assertEquals("Dr. Updated", refreshed?.fullName)
+        db.close()
+    }
+
+    @Test
+    fun `room - case rubrics use composite key and cascade with session`() = runBlocking {
+        val db = inMemoryDatabase()
+        val patientId = db.patientDao().insertPatient(
+            PatientEntity(
+                mnr = "TEST-101", name = "Rubric Patient", age = 45, sex = "Male",
+                thermalState = "CHILLY", dominantMiasm = "PSORA",
+                chiefComplaint = "test"
+            )
+        )
+        val session = SessionEntity(
+            patientId = patientId,
+            consultationType = "ACUTE",
+            summaryNotes = "test",
+            totalityScore = 70,
+            prescribedRemedy = "Bell",
+            potency = "30C",
+            posology = "single dose",
+            heringStatus = "Not Evaluated"
+        )
+        val sessionId = db.sessionDao().insertSession(session)
+
+        db.caseRubricDao().insertAll(
+            listOf(
+                CaseRubricEntity(sessionId = sessionId, rubricId = "r_mind_grief", weight = 3),
+                CaseRubricEntity(sessionId = sessionId, rubricId = "r_head_sun_agg", weight = 2, isEliminating = true)
+            )
+        )
+        var rubrics = db.caseRubricDao().getBySession(sessionId).first()
+        assertEquals(2, rubrics.size)
+        assertTrue(rubrics.any { it.rubricId == "r_head_sun_agg" && it.isEliminating })
+
+        // Re-inserting the same (sessionId, rubricId) replaces, never duplicates
+        db.caseRubricDao().insertAll(
+            listOf(CaseRubricEntity(sessionId = sessionId, rubricId = "r_mind_grief", weight = 1))
+        )
+        rubrics = db.caseRubricDao().getBySession(sessionId).first()
+        assertEquals(2, rubrics.size)
+        assertEquals(1, rubrics.first { it.rubricId == "r_mind_grief" }.weight)
+
+        // Deleting the session cascades to its rubrics
+        db.sessionDao().deleteSession(session)
+        assertEquals(0, db.caseRubricDao().getAll().first().size)
+        db.close()
+    }
+
+    @Test
+    fun `room - session persists case status transcript notes and school`() = runBlocking {
+        val db = inMemoryDatabase()
+        val patientId = db.patientDao().insertPatient(
+            PatientEntity(
+                mnr = "TEST-102", name = "V4 Patient", age = 30, sex = "Female",
+                thermalState = "HOT", dominantMiasm = "SYPHILIS",
+                chiefComplaint = "test"
+            )
+        )
+        val sessionId = db.sessionDao().insertSession(
+            SessionEntity(
+                patientId = patientId,
+                consultationType = "ACUTE",
+                caseStatus = "ACTIVE",
+                summaryNotes = "notes",
+                totalityScore = 65,
+                prescribedRemedy = "Puls",
+                potency = "200C",
+                posology = "twice daily",
+                heringStatus = "Not Evaluated",
+                transcriptText = "DOCTOR: Describe your symptoms\nPATIENT: My head aches in the sun",
+                clinicalNotes = "Chilly constitution with periodicity; puls confirmed by repertorization.",
+                repertorySchool = "BOEN"
+            )
+        )
+        val saved = db.sessionDao().getSessionsForPatient(patientId).first().first()
+        assertEquals(sessionId, saved.id)
+        assertEquals("ACTIVE", saved.caseStatus)
+        assertTrue(saved.transcriptText.contains("head aches in the sun"))
+        assertTrue(saved.clinicalNotes.contains("puls"))
+        assertEquals("BOEN", saved.repertorySchool)
+        db.close()
     }
 
     // ────────────────────────────────────────────────────────────────────────

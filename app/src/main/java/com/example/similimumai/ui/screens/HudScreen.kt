@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,6 +27,7 @@ import com.example.similimumai.data.model.*
 import com.example.similimumai.data.speech.ClinicalSimulator
 import com.example.similimumai.ui.components.AudioWaveformVisualizer
 import com.example.similimumai.ui.theme.*
+import com.example.similimumai.R
 import com.example.similimumai.ui.viewmodel.ConsultationUiState
 import com.example.similimumai.ui.viewmodel.ConsultationViewModel
 
@@ -101,7 +103,7 @@ fun HudScreen(
         item {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
-                    text = "DOCTOR'S SILENT PHYSICAL OBSERVATIONS (§83)",
+                    text = stringResource(R.string.hud_silent_observation_title),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -149,13 +151,13 @@ fun HudScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "ASK-NEXT HIGH-YIELD QUESTIONS",
+                            text = stringResource(R.string.hud_ask_next_title),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
                             color = AmberModalities
                         )
                         Text(
-                            text = "Hahnemannian Totality §153",
+                            text = stringResource(R.string.hud_totality_label),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -231,7 +233,7 @@ fun HudScreen(
                                 modifier = Modifier.size(18.dp)
                             )
                             Text(
-                                text = "CONSTITUTIONAL AI SYNTHESIS",
+                                text = stringResource(R.string.hud_ai_synthesis_title),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = VioletPqrs
@@ -255,7 +257,7 @@ fun HudScreen(
                                 )
                             } else {
                                 Text(
-                                    text = "Synthesize Case",
+                                    text = stringResource(R.string.hud_synthesize_button),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = Color.White
                                 )
@@ -283,7 +285,7 @@ fun HudScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "CONSULTATION DIALOGUE STREAM",
+                    text = stringResource(R.string.hud_dialogue_stream_title),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -310,7 +312,7 @@ fun HudScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "No dialogue yet. Click 'SIMULATE CASE' or start the ambient microphone to begin.",
+                            text = stringResource(R.string.hud_no_dialogue_hint),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -341,7 +343,7 @@ fun HudScreen(
                     OutlinedTextField(
                         value = manualUtterance,
                         onValueChange = { manualUtterance = it },
-                        placeholder = { Text("Enter patient phrase or clinical note...") },
+                        placeholder = { Text(stringResource(R.string.hud_input_placeholder)) },
                         modifier = Modifier
                             .weight(1f)
                             .testTag("manual_utterance_input"),
@@ -377,7 +379,7 @@ fun HudScreen(
             onDismissRequest = { showCasePicker = false },
             title = {
                 Text(
-                    text = "Select Clinical Simulation Case",
+                    text = stringResource(R.string.hud_select_simulation),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -422,7 +424,7 @@ fun HudScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showCasePicker = false }) {
-                    Text("Close")
+                    Text(stringResource(R.string.common_close))
                 }
             }
         )
@@ -450,12 +452,12 @@ private fun AudioControlCard(
             ) {
                 Column {
                     Text(
-                        text = "Clinical Audio Ingestion",
+                        text = stringResource(R.string.hud_audio_ingestion_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Continuous speech stream or multi-turn simulation",
+                        text = stringResource(R.string.hud_audio_ingestion_subtitle),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -509,7 +511,7 @@ private fun AudioControlCard(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "PAUSE STREAM",
+                            text = stringResource(R.string.hud_pause_stream_button),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -530,7 +532,7 @@ private fun AudioControlCard(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "SIMULATE CASE",
+                            text = stringResource(R.string.hud_simulate_case_button),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
                             color = EmeraldPrimary
