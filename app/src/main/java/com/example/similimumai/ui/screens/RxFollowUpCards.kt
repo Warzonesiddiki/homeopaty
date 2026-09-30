@@ -88,8 +88,7 @@ fun LmDilutionCard(
                         label = {
                             Text(level, style = MaterialTheme.typography.labelSmall)
                         },
-                        modifier = Modifier.testTag("lm_chip_${level.lowercase()}")
-                    )
+                        modifier = Modifier.testTag("lm_chip_${level.lowercase()}").minimumInteractiveComponentSize())
                 }
             }
 
@@ -330,7 +329,8 @@ private fun KentChipRow(
                     onClick = { onPick(index) },
                     label = {
                         Text(option, style = MaterialTheme.typography.labelSmall)
-                    }
+                    },
+                    modifier = Modifier.minimumInteractiveComponentSize()
                 )
             }
         }
@@ -389,8 +389,7 @@ fun CaseSheetCard(
                         label = {
                             Text(mode.label, style = MaterialTheme.typography.labelSmall)
                         },
-                        modifier = Modifier.testTag("case_mode_${mode.name.lowercase()}")
-                    )
+                        modifier = Modifier.testTag("case_mode_${mode.name.lowercase()}").minimumInteractiveComponentSize())
                 }
             }
 

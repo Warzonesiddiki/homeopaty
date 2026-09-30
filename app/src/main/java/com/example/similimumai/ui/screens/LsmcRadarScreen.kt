@@ -264,8 +264,7 @@ private fun ConstitutionalAssessmentCard(
                         label = { Text(thermal.name) },
                         modifier = Modifier
                             .weight(1f)
-                            .testTag("thermal_chip_${thermal.name}")
-                    )
+                            .testTag("thermal_chip_${thermal.name}").minimumInteractiveComponentSize())
                 }
             }
 
@@ -289,8 +288,7 @@ private fun ConstitutionalAssessmentCard(
                         label = { Text(miasm.name, style = MaterialTheme.typography.labelSmall) },
                         modifier = Modifier
                             .weight(1f)
-                            .testTag("miasm_chip_${miasm.name}")
-                    )
+                            .testTag("miasm_chip_${miasm.name}").minimumInteractiveComponentSize())
                 }
             }
         }

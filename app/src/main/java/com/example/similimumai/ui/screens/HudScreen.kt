@@ -134,8 +134,7 @@ fun HudScreen(
                                 containerColor = IndigoContainer.copy(alpha = 0.5f),
                                 labelColor = IndigoOnContainer
                             ),
-                            modifier = Modifier.testTag("obs_chip_${obs.id}")
-                        )
+                            modifier = Modifier.testTag("obs_chip_${obs.id}").minimumInteractiveComponentSize())
                     }
                 }
             }
@@ -340,6 +339,7 @@ fun HudScreen(
                                     modifier = Modifier
                                         .clickable { viewModel.processUtterance(sample, SpeakerType.PATIENT) }
                                         .testTag("sample_utterance_pill")
+                                        .minimumInteractiveComponentSize()
                                 ) {
                                     Text(
                                         text = sample,
@@ -522,7 +522,7 @@ private fun AudioControlCard(
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = if (uiState.isMicListening) "STOP MIC" else "START AMBIENT MIC",
+                        text = if (uiState.isMicListening) stringResource(R.string.stop_mic) else stringResource(R.string.start_mic),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold
                     )

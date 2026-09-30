@@ -114,8 +114,7 @@ fun MateriaMedicaScreen(
                             selectedContainerColor = EmeraldPrimary,
                             selectedLabelColor = Color.White
                         ),
-                        modifier = Modifier.testTag("materia_chip_${remedy.abbreviation}")
-                    )
+                        modifier = Modifier.testTag("materia_chip_${remedy.abbreviation}").minimumInteractiveComponentSize())
                 }
             }
         }
@@ -174,7 +173,8 @@ fun MateriaMedicaScreen(
                             FilterChip(
                                 selected = tempRemedyA.id == r.id,
                                 onClick = { tempRemedyA = r },
-                                label = { Text(r.abbreviation) }
+                                label = { Text(r.abbreviation) },
+                                modifier = Modifier.minimumInteractiveComponentSize()
                             )
                         }
                     }
@@ -185,7 +185,8 @@ fun MateriaMedicaScreen(
                             FilterChip(
                                 selected = tempRemedyB.id == r.id,
                                 onClick = { tempRemedyB = r },
-                                label = { Text(r.abbreviation) }
+                                label = { Text(r.abbreviation) },
+                                modifier = Modifier.minimumInteractiveComponentSize()
                             )
                         }
                     }

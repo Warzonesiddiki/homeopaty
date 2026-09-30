@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Similimum AI — Hinglish (Hindi in Latin script) locale
+     (docs/design/i18n-plan.md §2: values-b+hi+Latn for bilingual clinics) -->
+<resources>
+    <string name="app_name">Similimum AI</string>
+
+    <!-- Workspace 1: Co-Pilot HUD -->
+    <string name="start_mic">Ambient Microphone Shuru Karein</string>
+    <string name="stop_mic">Microphone Rokayein</string>
+    <string name="hud_silent_observation_title">Doctor ki Maun Sharirik Pratighyaan (§83)</string>
+    <string name="hud_ask_next_title">Agle High-Yield Prashn</string>
+    <string name="hud_totality_label">Hahnemannian Totality §153</string>
+    <string name="hud_ai_synthesis_title">Sanvathaanik AI Sanshleshnan</string>
+    <string name="hud_synthesize_button">Case ka Sanshleshnan Karein</string>
+    <string name="hud_dialogue_stream_title">Paramaarsh Sandwad Pravaah</string>
+    <string name="hud_no_dialogue_hint">Abhi koi sandwad nahin. \'Case Simulate Karein\' dabayein ya ambient microphone shuru karein.</string>
+    <string name="hud_select_simulation">Clinical Simulation Case Chuney</string>
+    <string name="hud_audio_ingestion_title">Clinical Audio Grahnan</string>
+    <string name="hud_audio_ingestion_subtitle">Niranantar bolchaal pravaah ya bahuraund simulation</string>
+    <string name="hud_pause_stream_button">Pravaah Rokayein</string>
+    <string name="hud_simulate_case_button">Case Simulate Karein</string>
+
+    <!-- Workspace 2: LSMC Radar -->
+    <string name="lsmc_decomposition_title">Boenninghausen LSMC Lakshan Vibhaajan</string>
+    <string name="lsmc_no_symptoms_hint">Abhi tak koi lakshan nahin nikaala. Microphone mein bolein ya HUD tab par simulation shuru karein.</string>
+    <string name="lsmc_totality_gauge_title">Boenninghausen Totality Maapak</string>
+    <string name="lsmc_totality_gauge_subtitle">Organon §83–§104 Poorn Case Gunavatta</string>
+    <string name="lsmc_pillar_assessment_title">12-Stubh Sanvathaanik Mulyaankan</string>
+    <string name="lsmc_thermal_state_title">Thermal Avastha (Sharirik Samanya)</string>
+    <string name="lsmc_miasm_title">Pratham Miasmatic Pravritti (Hahnemannian Chronic Roga)</string>
+    <string name="pqrs_153_label">§153 PQRS</string>
+    <string name="pqrs_153_label_alt">PQRS §153</string>
+
+    <!-- Workspace 3: Repertory -->
+    <string name="repertory_active_rubrics_title">Sakriya Repertory Rubrics</string>
+    <string name="repertory_no_rubrics_hint">Koi rubric sakriya nahin. \'+ Rubric Jodhein\' dabayein ya HUD par case stream karein.</string>
+    <string name="repertory_candidates_title">Kramit Ummidaar Similimum</string>
+    <string name="repertory_add_rubric_title">Maanak Repertory Rubric Jodhein</string>
+    <string name="repertory_school_title">Repertory Ganana Vidyaalay</string>
+    <string name="repertory_thermal_filter_title">Thermal Vilopan Filter (Asangat ko Agyogya Karein)</string>
+
+    <!-- Workspace 4: Materia Medica -->
+    <string name="materia_medicale_title">Tulanaatmak Materia Medica</string>
+    <string name="materia_medicale_subtitle">Do pratidwandvi polychrest chunein — keynotes ki tulna aur inimical suraksha jaanch ke liye:</string>
+    <string name="materia_keynotes_title">Shastriya Keynotes aur Visheshataayein (§153 PQRS)</string>
+    <string name="bullet_marker">•</string>
+    <string name="materia_relations_title">Clinical Aushadhi Sambandh aur Inimical Suraksha</string>
+    <string name="materia_inimical_label">KATHOR INIMICAL (kabhi bhi kram mein pradan na karein):</string>
+    <string name="materia_complementary_label">Pooraak Anuvartee:</string>
+    <string name="materia_antidotes_label">Antidotes (Vish-Prati):</string>
+
+    <!-- Workspace 5: Rx &amp; Hering -->
+    <string name="rx_prescription_pad_title">Clinical Prescription Pad</string>
+    <string name="rx_organon_ref">Organon §245–§285</string>
+    <string name="rx_dietary_restrictions_label">Ahaar Pratinibandh (Hahnemannian Antidote Nishedh):</string>
+    <string name="rx_save_record_button">Paramaarsh Record Sehejein (ROOM DB)</string>
+    <string name="hering_evaluator_title">Hering ke Chikitsya-Niyam Mulyaankankarta</string>
+    <string name="hering_evaluator_subtitle">Anuvarti rog-hataa pragati ki disha ka mulyaankan karein (§245):</string>
+    <string name="rx_no_saved_sessions_hint">Abhi koi sehaaya gaya paramaarsh satar nahin. Upar \'Paramaarsh Record Sehejein\' dabayein.</string>
+    <string name="practitioner_profile_title">Chikitsak Profail (Sthaniya)</string>
+    <string name="practitioner_full_name_label">Pura Naam</string>
+    <string name="practitioner_registration_label">Panjeekaran Sankhya</string>
+    <string name="practitioner_qualification_label">Shiksha / Paatrata</string>
+    <string name="practitioner_save_button">Chikitsak Profail Sehejein</string>
+
+    <!-- LM calculator + Kent observations + case sheet -->
+    <string name="lm_calculator_title">LM 50-Millesimal Chhadan Calculator</string>
+    <string name="lm_calculator_subtitle">Hahnemann ki Q vidhi — Organon §270-§272. Shakti star chunein:</string>
+    <string name="lm_hypersensitive_question">Atyadhik samvedansheel mareez (kam succussions)?</string>
+    <string name="kent_observations_title">Kent ki 12 Bhavishyavani-Pratighyaan</string>
+    <string name="kent_observations_subtitle">Anuvarti prakriya vagroonaan aur clinical agle-chantar maargadaan:</string>
+    <string name="kent_old_suppressed_label">Pooraani dabe huye lakshan phir se prakaat hue (Hering ki ulatee kram)</string>
+    <string name="case_sheet_export_title">Case Sheet Niryaat aur Case Mod</string>
+    <string name="case_sheet_export_subtitle">Paramaarsh mod chunein, phir prescription ke saath praroopit saada-paath case sheet banaayen:</string>
+    <string name="case_sheet_copy_button">Case Sheet Banaayen aur Copy Karein</string>
+    <string name="case_sheet_pdf_button">PDF Case Record Niryaat aur Saaja Karein</string>
+
+    <!-- Shared UI copy -->
+    <string name="common_close">Band Karein</string>
+    <string name="common_cancel">Radd Karein</string>
+    <string name="common_done">Poorn</string>
+    <string name="hud_input_placeholder">Mareej vaky ya clinical note likhein...</string>
+    <string name="materia_search_placeholder">30+ Polychrest Khojein...</string>
+    <string name="materia_compare_short">Tulna</string>
+    <string name="materia_compare_button">Samanaantar Tulna Karein</string>
+    <string name="repertory_add_rubric_button">Rubric Jodhein</string>
+    <string name="rx_remedy_label">Nirdharit Aushadhi</string>
+    <string name="rx_potency_label">Shakti (Potency)</string>
+    <string name="rx_posology_label">Dawaavidhi aur Prayog Nirdesh</string>
+
+    <!-- Workspace 6: Vision Lab -->
+    <string name="vision_lab_title">Nidaanaka Vison Lab</string>
+    <string name="vision_lab_subtitle">Maun sharirik parikonsh — preeksit nishkarsh dabayein; repertory matrix turtant update hoga.</string>
+</resources>

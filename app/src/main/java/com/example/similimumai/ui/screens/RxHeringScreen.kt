@@ -150,7 +150,8 @@ fun RxHeringScreen(
                                     potency = p
                                     viewModel.updatePrescription(remedyName, p, uiState.rxScale, posology)
                                 },
-                                label = { Text(p, style = MaterialTheme.typography.labelSmall) }
+                                label = { Text(p, style = MaterialTheme.typography.labelSmall) },
+                                modifier = Modifier.minimumInteractiveComponentSize()
                             )
                         }
                     }

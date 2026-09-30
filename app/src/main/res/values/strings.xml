@@ -3,6 +3,8 @@
     <string name="app_name">Similimum AI</string>
 
     <!-- Workspace 1: Co-Pilot HUD -->
+    <string name="start_mic">START AMBIENT MIC</string>
+    <string name="stop_mic">STOP MIC</string>
     <string name="hud_silent_observation_title">DOCTOR\'S SILENT PHYSICAL OBSERVATIONS (§83)</string>
     <string name="hud_ask_next_title">ASK-NEXT HIGH-YIELD QUESTIONS</string>
     <string name="hud_totality_label">Hahnemannian Totality §153</string>

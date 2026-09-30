@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Similimum AI — Hindi (Devanagari) locale (docs/design/i18n-plan.md §2: values-hi) -->
+<resources>
+    <string name="app_name">सिमिलिमम एआई</string>
+
+    <!-- Workspace 1: Co-Pilot HUD -->
+    <string name="start_mic">AMBIENT माइक्रोफ़ोन शुरू करें</string>
+    <string name="stop_mic">माइक्रोफ़ोन रोकें</string>
+    <string name="hud_silent_observation_title">चिकित्सक की मौन शारीरिक प्रतियोगियाँ (§83)</string>
+    <string name="hud_ask_next_title">अगले उच्च-उत्पादक प्रश्न</string>
+    <string name="hud_totality_label">हैनमैनिअन टोटैलिटी §153</string>
+    <string name="hud_ai_synthesis_title">संवैधानिक AI संश्लेषण</string>
+    <string name="hud_synthesize_button">केस का संश्लेषण करें</string>
+    <string name="hud_dialogue_stream_title">परामर्श संवाद प्रवाह</string>
+    <string name="hud_no_dialogue_hint">अभी कोई संवाद नहीं। \'केस सिमुलेट करें\' दबाएँ या वायु-माइक्रोफ़ोन शुरू करें।</string>
+    <string name="hud_select_simulation">क्लिनिकल सिमुलेशन केस चुनें</string>
+    <string name="hud_audio_ingestion_title">क्लिनिकल ऑडियो ग्रहण</string>
+    <string name="hud_audio_ingestion_subtitle">निरंतर बोलचाल प्रवाह या बहुराउंड सिमुलेशन</string>
+    <string name="hud_pause_stream_button">प्रवाह रुकائें</string>
+    <string name="hud_simulate_case_button">केस सिमुलेट करें</string>
+
+    <!-- Workspace 2: LSMC Radar -->
+    <string name="lsmc_decomposition_title">बोनिंगहाउज़न LSMC लक्षण विभाजन</string>
+    <string name="lsmc_no_symptoms_hint">अभी तक कोई लक्षण नहीं निकला। माइक्रोफ़ोन में बोलें या HUD टैब पर सिमुलेशन शुरू करें।</string>
+    <string name="lsmc_totality_gauge_title">बोनिंगहाउज़न टोटैलिटी मापक</string>
+    <string name="lsmc_totality_gauge_subtitle">ऑर्गैनॉन §83–§104 पूर्ण केस गुणवत्ता</string>
+    <string name="lsmc_pillar_assessment_title">12-स्तंभ संवैधानिक मूल्यांकन</string>
+    <string name="lsmc_thermal_state_title">थर्मल अवस्था (शारीरिक सामान्य)</string>
+    <string name="lsmc_miasm_title">प्रमुख मियाजमिक प्रवृत्ति (हैनमैनिअन क्रोनिक रोग)</string>
+    <string name="pqrs_153_label">§153 PQRS</string>
+    <string name="pqrs_153_label_alt">PQRS §153</string>
+
+    <!-- Workspace 3: Repertory -->
+    <string name="repertory_active_rubrics_title">सक्रिय रेपर्टरी रुब्रिक्स</string>
+    <string name="repertory_no_rubrics_hint">कोई रुब्रिक सक्रिय नहीं। \'+ रुब्रिक जोड़ें\' दबाएँ या HUD पर केस प्रवाहित करें।</string>
+    <string name="repertory_candidates_title">क्रमित उम्मीदवार सिमिलिमम</string>
+    <string name="repertory_add_rubric_title">मानक रेपर्टरी रुब्रिक जोड़ें</string>
+    <string name="repertory_school_title">रेपर्टरी गणना विद्यालय</string>
+    <string name="repertory_thermal_filter_title">थर्मल विलोपन फ़िल्टर (असंगत को अयोग्य करें)</string>
+
+    <!-- Workspace 4: Materia Medica -->
+    <string name="materia_medicale_title">तुलनात्मक मैटेरिया मेडिका</string>
+    <string name="materia_medicale_subtitle">दो प्रतिद्वंद्वी पॉलीक्रस्ट चुनें — keynote की तुलना और inimical सुरक्षा जाँच के लिए:</string>
+    <string name="materia_keynotes_title">शास्त्रीय keynote और विशेषताएँ (§153 PQRS)</string>
+    <string name="bullet_marker">•</string>
+    <string name="materia_relations_title">क्लिनिकल औषधि संबंध और inimical सुरक्षा</string>
+    <string name="materia_inimical_label">कठोर INIMICAL (कभी भी क्रम में प्रदान न करें):</string>
+    <string name="materia_complementary_label">पूरक अनुवर्ती:</string>
+    <string name="materia_antidotes_label">विष-प्रति (Antidotes):</string>
+
+    <!-- Workspace 5: Rx &amp; Hering -->
+    <string name="rx_prescription_pad_title">क्लिनिकल प्रिस्क्रिप्शन पैड</string>
+    <string name="rx_organon_ref">ऑर्गैनॉन §245–§285</string>
+    <string name="rx_dietary_restrictions_label">आहार प्रतिबंध (हैनमैनिअन antidote निषेध):</string>
+    <string name="rx_save_record_button">परामर्श रिकॉर्ड सहेजें (ROOM DB)</string>
+    <string name="hering_evaluator_title">हेरिंग के चिकित्सा-नियम मूल्यांकनकर्ता</string>
+    <string name="hering_evaluator_subtitle">अनुवर्ती रोग-हटान प्रगति की दिशा का मूल्यांकन करें (§245):</string>
+    <string name="rx_no_saved_sessions_hint">अभी कोई सहेजा गया परामर्श सत्र नहीं। ऊपर \'परामर्श रिकॉर्ड सहेजें\' दबाएँ।</string>
+    <string name="practitioner_profile_title">चिकित्सक प्रोफ़ाइल (स्थानीय)</string>
+    <string name="practitioner_full_name_label">पूरा नाम</string>
+    <string name="practitioner_registration_label">पंजीकरण संख्या</string>
+    <string name="practitioner_qualification_label">शिक्षा / पात्रता</string>
+    <string name="practitioner_save_button">चिकित्सक प्रोफ़ाइल सहेजें</string>
+
+    <!-- LM calculator + Kent observations + case sheet -->
+    <string name="lm_calculator_title">LM 50-MILLESIMAL छड़न कैलकुलेटर</string>
+    <string name="lm_calculator_subtitle">हैनमैनिअन की Q विधि — ऑर्गैनॉन §270-§272। शक्ति स्तर चुनें:</string>
+    <string name="lm_hypersensitive_question">अत्यधिक संवेदनशील मरीज़ (कम succussions)?</string>
+    <string name="kent_observations_title">केंट की 12 भविष्यवाणी-प्रतियोगियाँ</string>
+    <string name="kent_observations_subtitle">अनुवर्ती प्रतिक्रिया वर्गीकरण और क्लिनिकल अगले-चरण मार्गदर्शन:</string>
+    <string name="kent_old_suppressed_label">पुरानी दबे हुए लक्षण फिर से प्रकट हुए (हेरिंग की उल्टी क्रम)</string>
+    <string name="case_sheet_export_title">केस शीट निर्यात और केस मोड</string>
+    <string name="case_sheet_export_subtitle">परामर्श मोड चुनें, फिर प्रिस्क्रिप्शन के साथ प्रारूपित सादा-पाठ केस शीट बनाएँ:</string>
+    <string name="case_sheet_copy_button">केस शीट बनाएँ और कॉपी करें</string>
+    <string name="case_sheet_pdf_button">PDF केस रिकॉर्ड निर्यात और साझा करें</string>
+
+    <!-- Shared UI copy -->
+    <string name="common_close">बंद करें</string>
+    <string name="common_cancel">रद्द करें</string>
+    <string name="common_done">पूर्ण</string>
+    <string name="hud_input_placeholder">मरीज़ वाक्य या क्लिनिकल नोट लिखें...</string>
+    <string name="materia_search_placeholder">30+ पॉलीक्रस्ट खोजें...</string>
+    <string name="materia_compare_short">तुलना</string>
+    <string name="materia_compare_button">समानांतर तुलना करें</string>
+    <string name="repertory_add_rubric_button">रुब्रिक जोड़ें</string>
+    <string name="rx_remedy_label">निर्धारित औषधि</string>
+    <string name="rx_potency_label">शक्ति (Potency)</string>
+    <string name="rx_posology_label">दवावधि और प्रयोग निर्देश</string>
+
+    <!-- Workspace 6: Vision Lab -->
+    <string name="vision_lab_title">निदानात्मक विज़न लैब</string>
+    <string name="vision_lab_subtitle">मौन शारीरिक परीक्षण — प्रेक्षित निष्कर्ष दबाएँ; रेपर्टरी मेट्रिक्स तुरंत अपडेट होता है।</string>
+</resources>

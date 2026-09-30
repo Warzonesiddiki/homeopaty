@@ -341,8 +341,7 @@ private fun RepertoryControlsCard(
                         },
                         modifier = Modifier
                             .weight(1f)
-                            .testTag("school_chip_${school.name}")
-                    )
+                            .testTag("school_chip_${school.name}").minimumInteractiveComponentSize())
                 }
             }
 
@@ -363,20 +362,17 @@ private fun RepertoryControlsCard(
                     selected = thermalFilter == null,
                     onClick = { onThermalFilterChange(null) },
                     label = { Text("All", style = MaterialTheme.typography.labelSmall) },
-                    modifier = Modifier.weight(1f)
-                )
+                    modifier = Modifier.weight(1f).minimumInteractiveComponentSize())
                 FilterChip(
                     selected = thermalFilter == ThermalState.HOT,
                     onClick = { onThermalFilterChange(ThermalState.HOT) },
                     label = { Text("Only Hot", style = MaterialTheme.typography.labelSmall) },
-                    modifier = Modifier.weight(1f)
-                )
+                    modifier = Modifier.weight(1f).minimumInteractiveComponentSize())
                 FilterChip(
                     selected = thermalFilter == ThermalState.CHILLY,
                     onClick = { onThermalFilterChange(ThermalState.CHILLY) },
                     label = { Text("Only Chilly", style = MaterialTheme.typography.labelSmall) },
-                    modifier = Modifier.weight(1f)
-                )
+                    modifier = Modifier.weight(1f).minimumInteractiveComponentSize())
             }
         }
     }
