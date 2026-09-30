@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- PDF case records exported to app-specific external storage -->
+    <external-files-path
+        name="case_records"
+        path="." />
+</paths>

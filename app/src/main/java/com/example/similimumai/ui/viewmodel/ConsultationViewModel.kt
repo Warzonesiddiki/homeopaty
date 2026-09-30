@@ -6,12 +6,15 @@ import android.content.ClipboardManager
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.similimumai.data.engine.CaseSheetPdfRenderer
 import com.example.similimumai.data.engine.GeminiClinicalService
 import com.example.similimumai.data.engine.HomeopathyKnowledgeEngine
 import com.example.similimumai.data.local.ConsultationDatabase
+import com.example.similimumai.data.local.entity.FollowUpEntity
 import com.example.similimumai.data.local.entity.PatientEntity
 import com.example.similimumai.data.local.entity.PrescriptionEntity
 import com.example.similimumai.data.local.entity.SessionEntity
+import com.example.similimumai.data.local.entity.SymptomRecordEntity
 import com.example.similimumai.data.model.*
 import com.example.similimumai.data.repository.ConsultationRepository
 import com.example.similimumai.data.speech.AudioSpeechManager
@@ -24,6 +27,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.UUID
 
 class ConsultationViewModel(application: Application) : AndroidViewModel(application) {
@@ -39,7 +46,13 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
 
     init {
         val database = ConsultationDatabase.getDatabase(application)
-        repository = ConsultationRepository(database.patientDao(), database.sessionDao(), database.prescriptionDao())
+        repository = ConsultationRepository(
+            database.patientDao(),
+            database.sessionDao(),
+            database.prescriptionDao(),
+            database.symptomRecordDao(),
+            database.followUpDao()
+        )
 
         // Check Gemini status
         _uiState.update { it.copy(isGeminiAvailable = geminiService.isAvailable) }
@@ -356,8 +369,30 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
 
     // Plain-text case sheet + prescription clipboard generator (MVP MVE criterion 4)
     fun copyCaseSheetToClipboard(): String {
+        val sheet = buildCaseSheetText()
+        val context = getApplication()
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("Similimum AI Case Sheet", sheet))
+        return sheet
+    }
+
+    // PDF Case Record export (docs/05 Phase 4): returns absolute file path or null on failure
+    fun exportCaseSheetPdf(): String? {
+        return try {
+            val app: Application = getApplication()
+            val dir = app.getExternalFilesDir(null) ?: return null
+            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+            val file = File(dir, "case_sheet_$timestamp.pdf")
+            file.writeBytes(CaseSheetPdfRenderer.renderPdf(buildCaseSheetText()))
+            file.absolutePath
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun buildCaseSheetText(): String {
         val state = _uiState.value
-        val sheet = HomeopathyKnowledgeEngine.generateCaseSheet(
+        return HomeopathyKnowledgeEngine.generateCaseSheet(
             patientName = state.patientName,
             patientAge = state.patientAge,
             patientSex = state.patientSex,
@@ -376,10 +411,6 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
             hering = state.heringEvaluation,
             lmProtocol = state.lmProtocol
         )
-        val app: Application = getApplication()
-        val clipboard = app.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.setPrimaryClip(ClipData.newPlainText("Similimum AI Case Sheet", sheet))
-        return sheet
     }
 
     fun evaluateHering(insideToOut: Boolean, aboveDown: Boolean, vitalToLess: Boolean, reverseTime: Boolean) {
@@ -453,6 +484,46 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
                 heringPrognosis = _uiState.value.heringEvaluation?.prognosisVerdict ?: "Not Evaluated"
             )
             repository.savePrescription(prescription)
+
+            // Persist structured LSMC symptom records (docs/data/schema.md table 4)
+            val state = _uiState.value
+            repository.saveSymptomRecords(
+                state.symptoms.map { s ->
+                    SymptomRecordEntity(
+                        id = s.id,
+                        sessionId = sessionId,
+                        rawUtterance = s.rawUtterance,
+                        location = s.location,
+                        sensation = s.sensation,
+                        modalities = s.modalities,
+                        concomitant = s.concomitants,
+                        canonicalRubric = s.canonicalRubric,
+                        isPqrs = s.isPqrs,
+                        completenessScore = s.completenessScore
+                    )
+                }
+            )
+
+            // Persist the Hering/Kent follow-up outcome (docs/data/schema.md table 10)
+            val hering = state.heringEvaluation
+            val kent = state.kentObservationResult
+            if (hering != null || kent != null) {
+                repository.saveFollowUp(
+                    FollowUpEntity(
+                        sessionId = sessionId,
+                        sessionDate = System.currentTimeMillis(),
+                        insideOutward = hering?.insideToOutside ?: false,
+                        aboveDownward = hering?.aboveDownwards ?: false,
+                        vitalToLessVital = hering?.moreVitalToLess ?: false,
+                        reverseOrderAppearance = hering?.reverseOrderOfTime ?: false,
+                        kentObservationIndex = kent?.observation?.number ?: 0,
+                        clinicalAssessment = hering?.prognosisVerdict
+                            ?: kent?.summary
+                            ?: "Not Evaluated",
+                        recommendedAction = kent?.action?.name ?: ""
+                    )
+                )
+            }
 
             _uiState.update { it.copy(lastSavedSessionId = sessionId) }
         }

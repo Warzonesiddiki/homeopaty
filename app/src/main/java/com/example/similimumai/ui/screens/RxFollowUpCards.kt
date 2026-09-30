@@ -1,11 +1,16 @@
 package com.example.similimumai.ui.screens
 
+import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.core.content.FileProvider
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Share
+import java.io.File
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -408,6 +413,50 @@ fun CaseSheetCard(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "GENERATE & COPY CASE SHEET",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Print-ready PDF Case Record (docs/05 Phase 4)
+            OutlinedButton(
+                onClick = {
+                    val path = viewModel.exportCaseSheetPdf()
+                    if (path == null) {
+                        Toast.makeText(context, "PDF export failed", Toast.LENGTH_SHORT).show()
+                        return@OutlinedButton
+                    }
+                    val file = File(path)
+                    val uri = FileProvider.getUriForFile(
+                        context,
+                        "${context.packageName}.fileprovider",
+                        file
+                    )
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "application/pdf"
+                        putExtra(Intent.EXTRA_STREAM, uri)
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    context.startActivity(
+                        Intent.createChooser(shareIntent, "Share PDF Case Record")
+                    )
+                },
+                border = BorderStroke(1.dp, EmeraldPrimary),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .testTag("export_pdf_button")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "EXPORT & SHARE PDF CASE RECORD",
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold
                 )
