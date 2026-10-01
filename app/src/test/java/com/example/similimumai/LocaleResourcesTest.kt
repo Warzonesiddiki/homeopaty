@@ -39,7 +39,8 @@ class LocaleResourcesTest {
         R.string.rx_potency_label to "Potency",
         R.string.vision_lab_title to "DIAGNOSTIC VISION LAB",
         R.string.hud_simulate_case_button to "SIMULATE CASE",
-        R.string.case_sheet_copy_button to "GENERATE & COPY CASE SHEET"
+        R.string.case_sheet_copy_button to "GENERATE & COPY CASE SHEET",
+        R.string.patient_search_title to "PATIENT RECORDS"
     )
 
     @Test

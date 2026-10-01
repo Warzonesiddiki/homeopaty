@@ -507,6 +507,15 @@ object HomeopathyKnowledgeEngine {
     fun remediesForFinding(finding: VisualFinding): List<Remedy> =
         polychrests.filter { finding.remedyCodes.contains(it.abbreviation) }
 
+    /**
+     * Classical antidote remedies for the given remedy code (MVP: "antidotes
+     * & dietary prohibitions"). Case-insensitive; empty when the remedy is
+     * not in the local polychrest knowledge base.
+     */
+    fun antidotesFor(remedyCode: String): List<String> =
+        polychrests.find { it.abbreviation.equals(remedyCode, ignoreCase = true) }?.antidoteRemedies
+            ?: emptyList()
+
     // ─── Plain-Text Case Sheet & Prescription Generator (MVP MVE criterion 4) ───
     fun generateCaseSheet(
         patientName: String,
@@ -524,6 +533,7 @@ object HomeopathyKnowledgeEngine {
         rxScale: String,
         rxPosology: String,
         dietaryRestrictions: List<String>,
+        antidotes: List<String> = emptyList(),
         hering: HeringEvaluation? = null,
         lmProtocol: LmProtocol? = null
     ): String {
@@ -568,6 +578,12 @@ object HomeopathyKnowledgeEngine {
             sb.appendLine("  Split dosing: ${lm.splitDosing}")
         }
         sb.appendLine("DIETARY PROHIBITIONS: ${dietaryRestrictions.joinToString(", ")}")
+        sb.appendLine(
+            "ANTIDOTES: ${
+                if (antidotes.isEmpty()) "None documented for this remedy"
+                else antidotes.joinToString(", ")
+            }"
+        )
         hering?.let { h ->
             sb.appendLine()
             sb.appendLine("── HERING'S LAW (follow-up) ──────────────────")

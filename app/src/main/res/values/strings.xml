@@ -89,4 +89,14 @@
     <!-- Workspace 6: Vision Lab -->
     <string name="vision_lab_title">DIAGNOSTIC VISION LAB</string>
     <string name="vision_lab_subtitle">Silent physical inspection — tap observed findings; the repertory matrix updates instantly.</string>
+
+    <!-- Workspace 7: Patient Records (mvp-scope.md) -->
+    <string name="patient_search_title">PATIENT RECORDS</string>
+    <string name="patient_search_placeholder">Search by name or MNR…</string>
+    <string name="patient_registry_empty">No patient records yet — records appear here as cases are saved.</string>
+    <string name="patient_active_chip">ACTIVE</string>
+
+    <!-- Rx & Hering: classical antidotes (mvp-scope.md) -->
+    <string name="rx_antidotes_label">Antidotes (classical)</string>
+    <string name="rx_antidotes_none">None documented for this remedy</string>
 </resources>

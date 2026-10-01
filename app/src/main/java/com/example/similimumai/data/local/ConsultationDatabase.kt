@@ -19,6 +19,7 @@ import com.example.similimumai.data.local.entity.PatientEntity
 import com.example.similimumai.data.local.entity.PrescriptionEntity
 import com.example.similimumai.data.local.entity.SessionEntity
 import com.example.similimumai.data.local.entity.SymptomRecordEntity
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 
 @Database(
     entities = [
@@ -60,6 +61,13 @@ abstract class ConsultationDatabase : RoomDatabase() {
                     ConsultationDatabase::class.java,
                     "similimum_ai_db"
                 )
+                    // Encrypted on-device storage (mvp-scope.md): SQLCipher 256-bit AES
+                    // with a Keystore-wrapped passphrase (SecureDbKey).
+                    .openHelperFactory(
+                        SupportOpenHelperFactory(
+                            SecureDbKey.getOrCreatePassphrase(context.applicationContext).toByteArray()
+                        )
+                    )
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance

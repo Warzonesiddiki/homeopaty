@@ -16,7 +16,8 @@ enum class NavigationTab(val label: String) {
     REPERTORY("Repertory"),
     MATERIA_MEDICA("Materia Medica"),
     RX_HERING("Rx & Hering"),
-    VISION_LAB("Vision Lab")
+    VISION_LAB("Vision Lab"),
+    RECORDS("Records")
 }
 
 data class ConsultationUiState(
@@ -29,6 +30,11 @@ data class ConsultationUiState(
     val patientThermal: ThermalState = ThermalState.HOT,
     val patientMiasm: Miasm = Miasm.PSORA,
     val chiefComplaint: String = "Severe throbbing right-sided headache & silent grief",
+
+    // Patient registry (docs/product/mvp-scope.md: "patient record search")
+    val patients: List<PatientEntity> = emptyList(),
+    val patientSearchQuery: String = "",
+    val activePatientId: Long? = null,
 
     // Live Consult Stream
     val transcript: List<TranscriptEntry> = emptyList(),

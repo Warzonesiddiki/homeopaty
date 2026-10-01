@@ -208,6 +208,7 @@ private fun navIconAndTag(tab: NavigationTab): Pair<ImageVector, String> = when 
     NavigationTab.MATERIA_MEDICA -> Icons.Default.Favorite to "nav_materia"
     NavigationTab.RX_HERING -> Icons.Default.Check to "nav_rx"
     NavigationTab.VISION_LAB -> Icons.Default.Insights to "nav_vision_lab"
+    NavigationTab.RECORDS -> Icons.Default.Person to "nav_records"
 }
 
 /** The six clinical workspaces, switched by navigation tab. */
@@ -223,5 +224,6 @@ private fun CurrentWorkspace(
         NavigationTab.MATERIA_MEDICA -> MateriaMedicaScreen(uiState = uiState, viewModel = viewModel)
         NavigationTab.RX_HERING -> RxHeringScreen(uiState = uiState, viewModel = viewModel)
         NavigationTab.VISION_LAB -> VisionLabScreen(uiState = uiState, viewModel = viewModel)
+        NavigationTab.RECORDS -> PatientRegistryScreen(uiState = uiState, viewModel = viewModel)
     }
 }

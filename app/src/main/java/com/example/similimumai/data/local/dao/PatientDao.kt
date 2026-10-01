@@ -14,6 +14,17 @@ interface PatientDao {
     @Query("SELECT * FROM patients ORDER BY createdAt DESC")
     fun getAllPatients(): Flow<List<PatientEntity>>
 
+    /**
+     * Patient record search (docs/product/mvp-scope.md) — case-insensitive
+     * match on patient name or MNR, newest first.
+     */
+    @Query(
+        "SELECT * FROM patients WHERE name LIKE '%' || :query || '%' " +
+            "OR mnr LIKE '%' || :query || '%' " +
+            "ORDER BY name COLLATE NOCASE LIMIT 25"
+    )
+    fun searchPatients(query: String): Flow<List<PatientEntity>>
+
     @Query("SELECT * FROM patients WHERE id = :patientId LIMIT 1")
     suspend fun getPatientById(patientId: Long): PatientEntity?
 

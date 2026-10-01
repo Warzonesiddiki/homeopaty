@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.similimumai.data.engine.HomeopathyKnowledgeEngine
 import com.example.similimumai.data.local.entity.SessionEntity
 import com.example.similimumai.data.validation.ClinicalValidationRules
 import com.example.similimumai.ui.theme.*
@@ -197,6 +198,48 @@ fun RxHeringScreen(
                                     color = CrimsonOnContainer,
                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
                                 )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Classical antidotes for the prescribed remedy
+                    // (docs/product/mvp-scope.md: "antidotes & dietary prohibitions")
+                    val antidotes = HomeopathyKnowledgeEngine.antidotesFor(remedyName)
+                    Text(
+                        text = stringResource(R.string.rx_antidotes_label),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("rx_antidotes"),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        if (antidotes.isEmpty()) {
+                            Text(
+                                text = stringResource(R.string.rx_antidotes_none),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        } else {
+                            antidotes.forEach { a ->
+                                Surface(
+                                    color = IndigoContainer,
+                                    shape = RoundedCornerShape(6.dp)
+                                ) {
+                                    Text(
+                                        text = a,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = IndigoOnContainer,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                                    )
+                                }
                             }
                         }
                     }

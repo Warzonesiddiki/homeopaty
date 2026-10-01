@@ -90,4 +90,14 @@
     <!-- Workspace 6: Vision Lab -->
     <string name="vision_lab_title">निदानात्मक विज़न लैब</string>
     <string name="vision_lab_subtitle">मौन शारीरिक परीक्षण — प्रेक्षित निष्कर्ष दबाएँ; रेपर्टरी मेट्रिक्स तुरंत अपडेट होता है।</string>
+
+    <!-- Workspace 7: रोगी रिकॉर्ड (mvp-scope.md) -->
+    <string name="patient_search_title">रोगी रिकॉर्ड</string>
+    <string name="patient_search_placeholder">नाम या MNR से खोजें…</string>
+    <string name="patient_registry_empty">अभी कोई रोगी रिकॉर्ड नहीं — केस सेव होते ही यहाँ दिखेंगे।</string>
+    <string name="patient_active_chip">सक्रिय</string>
+
+    <!-- Rx & Hering: शास्त्रीय प्रतिविष (mvp-scope.md) -->
+    <string name="rx_antidotes_label">प्रतिविष (शास्त्रीय)</string>
+    <string name="rx_antidotes_none">इस औषधि के लिए कोई दस्तावेज़ित नहीं</string>
 </resources>

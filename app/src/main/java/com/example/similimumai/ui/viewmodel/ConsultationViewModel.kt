@@ -13,6 +13,7 @@ import com.example.similimumai.data.engine.CaseSheetPdfRenderer
 import com.example.similimumai.data.engine.GeminiClinicalService
 import com.example.similimumai.data.engine.HomeopathyKnowledgeEngine
 import com.example.similimumai.data.local.ConsultationDatabase
+import com.example.similimumai.data.local.dao.PatientDao
 import com.example.similimumai.data.local.entity.CaseRubricEntity
 import com.example.similimumai.data.local.entity.DoctorEntity
 import com.example.similimumai.data.local.entity.FollowUpEntity
@@ -31,6 +32,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -50,6 +52,10 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
     val uiState: StateFlow<ConsultationUiState> = _uiState.asStateFlow()
 
     private var simulationJob: Job? = null
+
+    // Patient record search (docs/product/mvp-scope.md: "patient record search")
+    private val patientDao: PatientDao = ConsultationDatabase.getDatabase(application).patientDao()
+    private val patientSearchQuery = MutableStateFlow("")
 
     // Connectivity monitor (docs/ai/offline-strategy.md §2.1)
     private val connectivityManager =
@@ -104,6 +110,13 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
             repository.allPatients.collect { list ->
                 _uiState.update { it.copy(savedPatients = list) }
             }
+        }
+
+        // Live patient record search: re-query Room whenever the query changes
+        viewModelScope.launch {
+            patientSearchQuery
+                .flatMapLatest { q -> patientDao.searchPatients(q) }
+                .collect { list -> _uiState.update { it.copy(patients = list) } }
         }
 
         // Observe saved sessions from Room
@@ -535,6 +548,7 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
             rxScale = state.rxScale,
             rxPosology = state.rxPosology,
             dietaryRestrictions = state.rxDietaryRestrictions,
+            antidotes = HomeopathyKnowledgeEngine.antidotesFor(state.rxRemedyName),
             hering = state.heringEvaluation,
             lmProtocol = state.lmProtocol
         )
@@ -714,6 +728,28 @@ class ConsultationViewModel(application: Application) : AndroidViewModel(applica
                 )
             }
         }
+    }
+
+    /** Updates the live patient-record search query (mvp-scope.md). */
+    fun setPatientSearchQuery(query: String) {
+        _uiState.update { it.copy(patientSearchQuery = query) }
+        patientSearchQuery.value = query
+    }
+
+    /** Loads a registry record as the active consultation patient. */
+    fun selectPatient(patient: PatientEntity) {
+        _uiState.update { it.copy(activePatientId = patient.id) }
+        updatePatientProfile(
+            name = patient.name,
+            age = patient.age,
+            sex = patient.sex,
+            thermal = runCatching { ThermalState.valueOf(patient.thermalState) }
+                .getOrDefault(ThermalState.AMBITHERMAL),
+            miasm = runCatching { Miasm.valueOf(patient.dominantMiasm) }
+                .getOrDefault(Miasm.PSORA),
+            complaint = patient.chiefComplaint
+        )
+        selectNavigationTab(NavigationTab.HUD)
     }
 
     fun updatePatientProfile(name: String, age: Int, sex: String, thermal: ThermalState, miasm: Miasm, complaint: String) {

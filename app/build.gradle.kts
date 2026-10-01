@@ -77,6 +77,9 @@ dependencies {
 
     // WorkManager — offline case sync pipeline (docs/ai/offline-strategy.md §3)
     implementation(libs.androidx.work.runtime.ktx)
+    // Encrypted on-device storage (docs/product/mvp-scope.md): SQLCipher-encrypted Room DB
+    implementation(libs.sqlcipher.android)
+    implementation(libs.androidx.security.crypto)
 
     // Room Database
     implementation(libs.androidx.room.runtime)

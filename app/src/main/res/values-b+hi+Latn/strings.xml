@@ -91,4 +91,14 @@
     <!-- Workspace 6: Vision Lab -->
     <string name="vision_lab_title">Nidaanaka Vison Lab</string>
     <string name="vision_lab_subtitle">Maun sharirik parikonsh — preeksit nishkarsh dabayein; repertory matrix turtant update hoga.</string>
+
+    <!-- Workspace 7: Patient Records (mvp-scope.md) -->
+    <string name="patient_search_title">Patient Records</string>
+    <string name="patient_search_placeholder">Naam ya MNR se khojen…</string>
+    <string name="patient_registry_empty">Abhi koi patient record nahi — cases save hote hi yahan dikhenge.</string>
+    <string name="patient_active_chip">ACTIVE</string>
+
+    <!-- Rx & Hering: classical antidotes (mvp-scope.md) -->
+    <string name="rx_antidotes_label">Antidotes (classical)</string>
+    <string name="rx_antidotes_none">Is remedy ke liye koi documented nahi</string>
 </resources>
